@@ -34,11 +34,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cell.cs" />
-    <Compile Include="IGrid.cs" />
+    <Compile Include="Interfaces\IGrid.cs" />
     <Compile Include="Grid.cs" />
-    <Compile Include="ICell.cs" />
+    <Compile Include="Interfaces\ICell.cs" />
     <Compile Include="Inputs.cs" />
+    <Compile Include="Pizza\Pizza.cs" />
+    <Compile Include="Pizza\PizzCell.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Pizza\PizzSlice.cs" />
     <Compile Include="Write.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
