@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashCode", "HashCode\HashCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashCode.Client", "HashCode.Client\HashCode.Client.csproj", "{7D5991A7-9767-49ED-8D12-F3262884F036}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashCode.Tests", "HashCode.Tests\HashCode.Tests.csproj", "{13533BB1-6AB4-466E-8102-DFE084758BD0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashCode.Tests", "HashCode.Tests\HashCode.Tests.csproj", "{36397BFC-B6A0-4C49-A0A9-013EF3784BD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{7D5991A7-9767-49ED-8D12-F3262884F036}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D5991A7-9767-49ED-8D12-F3262884F036}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D5991A7-9767-49ED-8D12-F3262884F036}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13533BB1-6AB4-466E-8102-DFE084758BD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13533BB1-6AB4-466E-8102-DFE084758BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13533BB1-6AB4-466E-8102-DFE084758BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13533BB1-6AB4-466E-8102-DFE084758BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36397BFC-B6A0-4C49-A0A9-013EF3784BD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36397BFC-B6A0-4C49-A0A9-013EF3784BD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36397BFC-B6A0-4C49-A0A9-013EF3784BD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36397BFC-B6A0-4C49-A0A9-013EF3784BD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
