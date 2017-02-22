@@ -27,45 +27,5 @@
                 return resourcesFolder;
             }
         }
-
-        public static string ResourcesPizzaFolder
-        {
-            get
-            {
-                return Path.Combine(Inputs.ResourcesFolder, "Pizza");
-            }
-        }
-
-        public static string ResourcesPizzaInputBig
-        {
-            get
-            {
-                return Path.Combine(ResourcesPizzaFolder, "big.in");
-            }
-        }
-
-        public static string ResourcesPizzaInputExample
-        {
-            get
-            {
-                return Path.Combine(ResourcesPizzaFolder, "example.in");
-            }
-        }
-
-        public static string ResourcesPizzaInputMedium
-        {
-            get
-            {
-                return Path.Combine(ResourcesPizzaFolder, "medium.in");
-            }
-        }
-
-        public static string ResourcesPizzaInputSmall
-        {
-            get
-            {
-                return Path.Combine(ResourcesPizzaFolder, "small.in");
-            }
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace HashCode
+﻿namespace HashCode.Pizza
 {
     public enum PizzCellType
     {
@@ -19,6 +19,11 @@
             this.Type = type;
         }
 
+        public PizzCell(int row, int column, char type) : base(row, column)
+        {
+            this.Type = PizzCell.TypeFromChar(type);
+        }
+
         public PizzCellType Type { get; set; }
 
         public static PizzCellType TypeFromChar(char input)
@@ -34,6 +39,13 @@
                 default:
                     return PizzCellType.Free;
             }
+        }
+
+        public bool IsSliced { get; set; }
+
+        public override string ToString()
+        {
+            return Write.Invariant($"{this.Row} {this.Column}");
         }
     }
 }
