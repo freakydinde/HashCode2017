@@ -3,3 +3,8 @@
 ################################################################################
 
 /HashCode/bin/Debug
+/HashCode/obj/Debug
+/HashCode.Client/bin/Debug
+/HashCode.Client/obj/Debug
+/HashCode.Tests/bin/Debug
+/HashCode.Tests/obj/Debug

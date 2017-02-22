@@ -1,10 +1,17 @@
 ﻿namespace HashCode.Client
 {
-    class Program
+    using System;
+
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Console.WriteLine(Write.Invariant($"resources folder path : {Inputs.Resources}")
+            Pizza();
+        }
+
+        public static void Pizza()
+        {
+            Console.WriteLine(Write.Invariant($"resources folder path : {Inputs.ResourcesFolder}"));
         }
     }
 }

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{13533BB1-6AB4-466E-8102-DFE084758BD0}</ProjectGuid>
+    <ProjectGuid>{36397BFC-B6A0-4C49-A0A9-013EF3784BD9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HashCode.Tests</RootNamespace>
@@ -47,7 +47,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\HashCode\HashCode.csproj">
+      <Project>{a8c2b763-b93a-4422-acd7-273c4081d564}</Project>
+      <Name>HashCode</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
