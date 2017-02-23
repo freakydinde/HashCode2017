@@ -59,7 +59,7 @@
         }
 
         /// <summary>Gets or sets grid cells</summary>
-        public List<ICell> Cells { get; set; }
+        public virtual List<ICell> Cells { get; set; }
 
         /// <summary>Gets or sets a boolean indicating if grid can loop when column left limit is reached</summary>
         public bool ColumnLoopLeft { get; set; }

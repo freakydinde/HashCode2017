@@ -50,8 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Pizza\PizzaTests.cs" />
-    <Compile Include="Pizza\SliceTest.cs" />
+    <Compile Include="PizzTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

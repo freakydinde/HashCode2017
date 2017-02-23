@@ -9,3 +9,6 @@ C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Debug\Microsoft.VisualStudio.QualityTo
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Debug\HashCode.Test.csprojResolveAssemblyReference.cache
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Debug\HashCode.Test.dll
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Debug\HashCode.Test.pdb
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\obj\Debug\HashCode.Test.csprojResolveAssemblyReference.cache
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\obj\Debug\HashCode.Test.dll
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\obj\Debug\HashCode.Test.pdb

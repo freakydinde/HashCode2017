@@ -1,4 +1,4 @@
-﻿namespace HashCode.Pizza
+﻿namespace HashCode.Client
 {
     using System.IO;
 

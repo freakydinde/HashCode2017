@@ -37,9 +37,7 @@
     <Compile Include="Interfaces\IGrid.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="Interfaces\ICell.cs" />
-    <Compile Include="Inputs.cs" />
-    <Compile Include="Pizza\PizzInputs.cs" />
-    <Compile Include="Pizza\Pizza.cs" />
+    <Compile Include="Pizza\PizzGrid.cs" />
     <Compile Include="Pizza\PizzCell.cs" />
     <Compile Include="Pizza\PizzRound.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

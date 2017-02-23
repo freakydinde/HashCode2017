@@ -27,7 +27,7 @@
         {
             get
             {
-                return from i in this.Cells where (i as PizzCell).Type == PizzCellType.Mushroom select i;
+                return from i in this.PizzCells where i.Type == PizzCellType.Mushroom select i;
             }
         }
 
@@ -43,7 +43,7 @@
         {
             get
             {
-                return from i in this.Cells where (i as PizzCell).Type == PizzCellType.Tomato select i;
+                return from i in this.PizzCells where i.Type == PizzCellType.Tomato select i;
             }
         }
 
