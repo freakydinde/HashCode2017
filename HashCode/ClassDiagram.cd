@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="HashCode.CacheServer">
+    <Position X="6.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEgAAAAAAAAAAAAAAAAkAAAgAAAAAAAAA=</HashCode>
+      <FileName>CacheServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HashCode.EndPoint">
+    <Position X="8.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAQAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EndPoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HashCode.GainCacheServer">
+    <Position X="8.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>GainCacheServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HashCode.Latency">
+    <Position X="2.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAQA=</HashCode>
+      <FileName>Latency.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HashCode.Request">
+    <Position X="4.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAABAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Request.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HashCode.Round">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAEAAAAAABAACAg=</HashCode>
+      <FileName>Round.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HashCode.Video">
+    <Position X="2.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Video.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

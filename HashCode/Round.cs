@@ -8,19 +8,20 @@
 
     public class Round
     {
-        private List<CacheServer> CacheServers;
-        private List<EndPoint> EndPoints;
-        private List<Request> Requests;
-        private List<Video> Videos;
+        public List<CacheServer> CacheServers;
+        public List<EndPoint> EndPoints;
+        public List<Request> Requests;
+        public List<Video> Videos;
 
-        public Round(List<Video> videos, List<EndPoint> endPoints, List<Request> requests)
+        public Round(List<CacheServer> cacheServers, List<EndPoint> endPoints, List<Request> requests, List<Video> videos)
         {
+            this.CacheServers = cacheServers;
             this.Videos = videos;
             this.EndPoints = endPoints;
             this.Requests = requests;
         }
 
-        public static Request RoundFromFile(string input)
+        public static Round RoundFromFile(string input)
         {
             IEnumerable<int[]> inputs = from i in File.ReadAllLines(input) select (from j in i.Split(' ') select Convert.ToInt32(j, CultureInfo.InvariantCulture)).ToArray();
 
@@ -30,18 +31,27 @@
             int cacheServerNumber = inputs.ElementAt(0)[3];
             int cacheServerCapacity = inputs.ElementAt(0)[4];
 
+            Write.Trace($"videosNumber {videosNumber} endpointNumber {endpointNumber} requestNumber {requestNumber} cacheServerNumber {cacheServerNumber} cacheServerCapacity {cacheServerCapacity}");
+
             int[] videoSizes = inputs.ElementAt(1);
 
             int videoIndex = 0;
+
             List<Video> videos = new List<Video>();
             foreach (int size in videoSizes)
             {
-                Video video = new Video(videoIndex, size);
+                Write.Trace($"video {videoIndex} size : {size}");
+
+                videos.Add(new Video(videoIndex, size));
+
+                videoIndex++;
             }
 
             List<CacheServer> cacheServers = new List<CacheServer>();
             for (int cacheServerIndex = 0; cacheServerIndex < cacheServerNumber; cacheServerIndex++)
             {
+                Write.Trace($"cache server {cacheServerIndex} capacity : {cacheServerCapacity}");
+
                 cacheServers.Add(new CacheServer(cacheServerIndex, cacheServerCapacity));
             }
 
@@ -49,15 +59,23 @@
 
             List<EndPoint> endpoints = new List<EndPoint>();
 
-            int endPointIndex = 0;
+            int endPointId = 0;
             while (nextLinesEnumerator.MoveNext())
             {
                 int[] firstLine = nextLinesEnumerator.Current;
 
+                // request contains 3 integer, while endpoint info 2
+                if (firstLine.Count() > 2)
+                {
+                    break;
+                }
+
                 int dataCenterLatency = firstLine[0];
                 int dataCenterNumber = firstLine[1];
 
-                EndPoint endpoint = new EndPoint(endPointIndex, dataCenterLatency);
+                Write.Trace($"endpoint {endPointId} dataCenterLatency : {dataCenterLatency}");
+
+                EndPoint endpoint = new EndPoint(endPointId, dataCenterLatency);
 
                 List<Latency> latencies = new List<Latency>();
 
@@ -69,13 +87,33 @@
                     int cacheServerId = nextLine[0];
                     int cacheServerLatency = nextLine[1];
 
-                    endpoint.CacheServerIds.Add(cacheServerId);
+                    cacheServers[cacheServerId].EndPointID.Add(endPointId);
+
+                    Write.Trace($"cacheserver {cacheServerId}, latency : {cacheServerLatency}");
+
                     endpoint.CacheServerLatencies.Add(new Latency(cacheServerId, cacheServerLatency));
                 }
 
                 endpoints.Add(endpoint);
-                endPointIndex++;
+                endPointId++;
             }
+
+            List<Request> requests = new List<Request>();
+            do
+            {
+                int[] currentLine = nextLinesEnumerator.Current;
+
+                int videoId = currentLine[0];
+                int endpointId = currentLine[1];
+                int occurency = currentLine[2];
+
+                Write.Trace($"new request endpointid {endpointId}, videoid : {videoId}, occurency : {occurency}");
+
+                requests.Add(new Request(endpointId, videoId, occurency));
+            }
+            while (nextLinesEnumerator.MoveNext());
+
+            return new Round(cacheServers, endpoints, requests, videos);
         }
     }
 }

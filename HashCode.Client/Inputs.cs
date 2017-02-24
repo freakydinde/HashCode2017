@@ -8,26 +8,14 @@
     {
         private static string resourcesFolder;
 
-        public static string ResourcesFolder
+        public static string InExample
         {
             get
             {
-                if (resourcesFolder == null)
-                {
-                    resourcesFolder = AppDomain.CurrentDomain.BaseDirectory;
-
-                    while (!Directory.Exists(Path.Combine(resourcesFolder, "Resources")))
-                    {
-                        resourcesFolder = Directory.GetParent(resourcesFolder).FullName;
-                    }
-
-                    resourcesFolder = Path.Combine(resourcesFolder, "Resources");
-                }
-
-                return resourcesFolder;
+                return Path.Combine(Inputs.ResourcesFolder, "example.in");
             }
         }
-        
+
         public static string InKitten
         {
             get
@@ -57,6 +45,26 @@
             get
             {
                 return Path.Combine(Inputs.ResourcesFolder, "videos_worth_spreading.in");
+            }
+        }
+
+        public static string ResourcesFolder
+        {
+            get
+            {
+                if (resourcesFolder == null)
+                {
+                    resourcesFolder = AppDomain.CurrentDomain.BaseDirectory;
+
+                    while (!Directory.Exists(Path.Combine(resourcesFolder, "Resources")))
+                    {
+                        resourcesFolder = Directory.GetParent(resourcesFolder).FullName;
+                    }
+
+                    resourcesFolder = Path.Combine(resourcesFolder, "Resources");
+                }
+
+                return resourcesFolder;
             }
         }
     }

@@ -7,8 +7,8 @@ Param ()
 $solutionFolder = Split-Path $PSScriptRoot
 
 Get-ChildItem -Path $solutionFolder -Directory -Recurse -Hidden | ? { $_.Name -eq ".vs" } | % { Remove-Item $_.FullName -Recurse -Force }
-Get-ChildItem -Path $solutionFolder -Directory -Recurse| ? { $_.Name -eq "bin" -or $_.Name -eq "obj" } | % { Remove-Item $_.FullName -Recurse -Force }
-Get-ChildItem -Path $solutionFolder -File -Recurse | ? { $_.Name.EndsWith("csproj.vspscc") -or $_.Name -eq "StyleCop.Cache" } | % { Remove-Item $_.FullName -Force }
+Get-ChildItem -Path $solutionFolder -Directory -Recurse  -Hidden | ? { $_.Name -eq "bin" -or $_.Name -eq "obj" } | % { Remove-Item $_.FullName -Recurse -Force }
+Get-ChildItem -Path $solutionFolder -File -Recurse -Hidden | ? { $_.Name.EndsWith("csproj.vspscc") -or $_.Name -eq "StyleCop.Cache" } | % { Remove-Item $_.FullName -Force }
 
 # zip codes files
 $csFiles = $solutionFolder | Get-ChildItem -Filter *.cs -Exclude Temp* -Recurse

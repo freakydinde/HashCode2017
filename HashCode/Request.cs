@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-
-namespace HashCode
+﻿namespace HashCode
 {
     public class Request
     {
         public int EndPointID;
-        public int NumAsked;
-        public int VideoID;   
+        public int Occurency;
+        public int VideoID;
+
+        public Request(int endPointID, int videoID, int occurency)
+        {
+            this.EndPointID = endPointID;
+            this.Occurency = occurency;
+            this.VideoID = videoID;
+        }
     }
 }
