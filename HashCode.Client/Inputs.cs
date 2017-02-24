@@ -27,5 +27,37 @@
                 return resourcesFolder;
             }
         }
+        
+        public static string InKitten
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "kittens.in");
+            }
+        }
+
+        public static string InMeAtTheZoo
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "me_at_the_zoo.in");
+            }
+        }
+
+        public static string InTrendingToday
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "trending_today.in");
+            }
+        }
+
+        public static string InVideosWorthSpreading
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "videos_worth_spreading.in");
+            }
+        }
     }
 }

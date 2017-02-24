@@ -44,9 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Inputs.cs" />
-    <Compile Include="PizzInputs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\StopWatch.cs" />
+    <Compile Include="Utils\Write.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HashCode\HashCode.csproj">
