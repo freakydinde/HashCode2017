@@ -5,6 +5,7 @@
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Text;
 
     public class Round
     {
@@ -114,6 +115,81 @@
             while (nextLinesEnumerator.MoveNext());
 
             return new Round(cacheServers, endpoints, requests, videos);
+        }
+
+        public CacheServer GetCacheServer(int id)
+        {
+            return (from i in this.CacheServers where i.ID == id select i).FirstOrDefault();
+        }
+
+        public void AssignVideosList()
+        {
+            Write.TraceWatch("starting assign videos list");
+
+            foreach(GainCacheServer gainCacheServer in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte))
+            {
+                Video video = this.Videos.Where(x => x.ID == gainCacheServer.VideoID).FirstOrDefault();
+                //LCacheServer cacheServer = this.CacheServers.Where(x => x.ID == gainCacheServer.).FirstOrDefault();
+                if (this.CacheServers.Where(x => x.RefusedLastAssigment == false).Count() == 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        public void PrintAssigment(string outputFile)
+        {
+            Write.TraceWatch("starting print videos assigment");
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(this.CacheServers.Count().ToString());
+
+            foreach(CacheServer cacheServer in this.CacheServers)
+            {
+                sb.Append(cacheServer.ID + " ");
+
+                foreach(int id in cacheServer.VideosID)
+                {
+                    sb.Append(id.ToString() + " ");
+                }
+
+                sb.AppendLine();
+            }
+
+            if (File.Exists(outputFile)) File.Delete(outputFile);
+
+            File.WriteAllText(outputFile, sb.ToString());
+        }
+
+        public void SetVideosList()
+        {
+            Write.TraceWatch("starting set videos list");
+
+            // init cache servers
+            foreach (CacheServer cacheServer in this.CacheServers)
+            {
+                cacheServer.Reset();
+            }
+
+            Write.TraceWatch("group request and endpoint");
+
+            var extendedRequests = from i in this.Requests
+                                   join j in this.EndPoints on i.EndPointID equals j.ID
+                                   join k in this.Videos on i.VideoID equals k.ID
+                                   select new { i.VideoID, i.EndPointID, j.CacheServerLatencies, j.DataCenterLatency, k.Size };
+
+            foreach (var request in extendedRequests)
+            {
+                foreach (Latency latency in request.CacheServerLatencies)
+                {
+                    int gain = request.DataCenterLatency - latency.Time;
+
+                    GetCacheServer(latency.CacheServerID).GainCacheServers.Add(new GainCacheServer(request.EndPointID, gain, request.VideoID, request.Size));
+                }
+            }
+
+            Write.Invariant($"{extendedRequests}");
         }
     }
 }
