@@ -117,24 +117,51 @@
             return new Round(cacheServers, endpoints, requests, videos);
         }
 
-        public CacheServer GetCacheServer(int id)
-        {
-            return (from i in this.CacheServers where i.ID == id select i).FirstOrDefault();
-        }
-
         public void AssignVideosList()
         {
             Write.TraceWatch("starting assign videos list");
 
-            foreach(GainCacheServer gainCacheServer in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte))
+            Write.TraceVisible("gain cache servers");
+
+            Write.TraceCollection(this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte), "\r\n");
+
+            foreach (GainCacheServer gainCacheServer in from i in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte) group i by new { i.EndPointID, i.VideoID } into grp select grp.First())
             {
-                Video video = this.Videos.Where(x => x.ID == gainCacheServer.VideoID).FirstOrDefault();
-                //LCacheServer cacheServer = this.CacheServers.Where(x => x.ID == gainCacheServer.).FirstOrDefault();
+                Write.TraceWatch($"\r\nprocessing gainCacheServer {gainCacheServer.ToString()}");
+
+                IEnumerable<CacheServer> endpointCacheServers = from i in this.CacheServers where i.EndPointID.Where(x => x == gainCacheServer.EndPointID).Any() select i;
+
+                // test if another cache server linked to the same endpoint already host video
+                if (!endpointCacheServers.Where(x => x.VideoIsHosted(gainCacheServer.VideoID)).Any())
+                {
+                    Write.Trace("\r\ncollection : ");
+
+                    Write.TraceCollection((from i in endpointCacheServers orderby i.EndPointID.Count(), i.RemainingSize descending select i), "\r\n");
+
+                    IEnumerator<CacheServer> cacheServers = (from i in endpointCacheServers orderby i.EndPointID.Count(), i.RemainingSize descending select i).GetEnumerator();
+
+                    Video video = this.Videos.Where(x => x.ID == gainCacheServer.VideoID).FirstOrDefault();
+
+                    while (cacheServers.MoveNext())
+                    {
+                        if (cacheServers.Current.AssignVideo(video)) break;
+                    }
+                }
+                else
+                {
+                    Write.Trace($"video id {gainCacheServer.VideoID} is already hosted on a endpoint cache server");
+                }
+
                 if (this.CacheServers.Where(x => x.RefusedLastAssigment == false).Count() == 0)
                 {
                     break;
                 }
             }
+        }
+
+        public CacheServer GetCacheServer(int id)
+        {
+            return (from i in this.CacheServers where i.ID == id select i).FirstOrDefault();
         }
 
         public void PrintAssigment(string outputFile)
@@ -143,18 +170,21 @@
 
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(this.CacheServers.Count().ToString());
+            sb.AppendLine(this.CacheServers.Where(x => x.VideosID.Any()).Count().ToString());
 
-            foreach(CacheServer cacheServer in this.CacheServers)
+            foreach (CacheServer cacheServer in this.CacheServers)
             {
-                sb.Append(cacheServer.ID + " ");
-
-                foreach(int id in cacheServer.VideosID)
+                if (cacheServer.VideosID.Any())
                 {
-                    sb.Append(id.ToString() + " ");
-                }
+                    sb.Append(cacheServer.ID + " ");
 
-                sb.AppendLine();
+                    foreach (int id in cacheServer.VideosID)
+                    {
+                        sb.Append(id.ToString() + " ");
+                    }
+
+                    sb.AppendLine();
+                }
             }
 
             if (File.Exists(outputFile)) File.Delete(outputFile);

@@ -20,6 +20,23 @@
             RoundTests.round = Round.RoundFromFile(Inputs.InExample);
         }
 
+        [TestMethod()]
+        public void AssignVideosListTest()
+        {
+            RoundTests.round.SetVideosList();
+
+            RoundTests.round.AssignVideosList();
+
+            Write.TraceWatch("videos assigned");
+
+            RoundTests.round.PrintAssigment(Inputs.OutExample);
+
+            string actual = File.ReadAllText(Inputs.OutExample);
+            string expected = "3\r\n0 2 \r\n1 3 1 \r\n2 0 1 ";
+
+            Assert.AreEqual(expected, actual);
+        }
+
         [TestMethod]
         public void RoundFromExampleTest()
         {

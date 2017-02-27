@@ -71,40 +71,51 @@
         }
 
         /// <summary>send string to console output, using current culture</summary>
+        /// <param name="message">message to log</param>
+        public static void Print(string message)
+        {
+            Console.WriteLine(Write.Current($"{message}"));
+        }
+
+        /// <summary>send string to console output, using current culture</summary>
         /// <param name="formattable">initial string as formattable</param>
         public static void Print(FormattableString formattable)
         {
             Console.WriteLine(Write.Current(formattable));
+        }
 
-            Write.Trace(formattable);
+        /// <summary>flatten a inputs to string and print result</summary>
+        /// <param name="inputs">inputs to flat</param>
+        public static void PrintCollection(IEnumerable<object> inputs)
+        {
+            Console.WriteLine(Write.Collection(inputs));
+        }
+
+        /// <summary>flatten a inputs to string and print result</summary>
+        /// <param name="inputs">inputs to flat</param>
+        /// <param name="separator">string.Join separator</param>
+        public static void PrintCollection(IEnumerable<object> inputs, string separator)
+        {
+            Console.WriteLine(Write.Collection(inputs, separator));
         }
 
         /// <summary>send StopWatch elapsed and message to console output, using current culture</summary>
         /// <param name="message">message to log</param>
         public static void PrintWatch(string message)
         {
-            Write.Print($"{message} {Write.StopWatch.ElapsedMilliseconds}ms");
+            Console.WriteLine(Write.Current($"{message} {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
 
         /// <summary>send StopWatch elapsed to console output, using current culture</summary>
         public static void PrintWatch()
         {
-            Write.Print($"starting {Write.StopWatch.ElapsedMilliseconds}ms");
+            Console.WriteLine(Write.Current($"stopwatch : {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
 
-        /// <summary>send StopWatch elapsed and message to console output, using current culture, then reset stopwatch timer</summary>
-        /// <param name="message">message to log</param>
-        public static void PrintWatchThenReset(string message)
+        /// <summary>Reset stopwatch singleton</summary>
+        public static void ResetWatch()
         {
-            PrintWatchThenReset(message);
-            stopWatch.Reset();
-        }
-
-        /// <summary>send StopWatch elapsed console output, using current culture, then reset stopwatch timer</summary>
-        public static void PrintWatchThenReset()
-        {
-            PrintWatchThenReset();
-            stopWatch.Reset();
+            Write.StopWatch.Reset();
         }
 
         /// <summary>send message and collection flatten to string to debug output, using current culture</summary>
@@ -138,6 +149,21 @@
             System.Diagnostics.Trace.WriteLine(message?.ToString(CultureInfo.CurrentCulture));
         }
 
+        /// <summary>flatten a inputs to string and trace result</summary>
+        /// <param name="inputs">inputs to flat</param>
+        public static void TraceCollection(IEnumerable<object> inputs)
+        {
+            System.Diagnostics.Trace.WriteLine(Write.Collection(inputs));
+        }
+
+        /// <summary>flatten a inputs to string and trace result</summary>
+        /// <param name="inputs">inputs to flat</param>
+        /// <param name="separator">string.Join separator</param>
+        public static void TraceCollection(IEnumerable<object> inputs, string separator)
+        {
+            System.Diagnostics.Trace.WriteLine(Write.Collection(inputs, separator));
+        }
+
         /// <summary>send string to debug output, using current culture</summary>
         /// <param name="formattable">initial string as formattable</param>
         public static void TraceInline(FormattableString formattable)
@@ -149,35 +175,34 @@
         /// <param name="formattable">initial string as formattable</param>
         public static void TraceVisible(FormattableString formattable)
         {
-            System.Diagnostics.Trace.Write(Write.Current($"{Environment.NewLine}!! {formattable?.ToString()}{Environment.NewLine}"));
+            System.Diagnostics.Trace.Write(Write.Current($"{Environment.NewLine}{Environment.NewLine}{formattable?.ToString()}{Environment.NewLine}{Environment.NewLine}"));
+        }
+
+        /// <summary>send string to debug output, using current culture</summary>
+        /// <param name="message">message to log</param>
+        public static void TraceVisible(string message)
+        {
+            System.Diagnostics.Trace.Write(Write.Current($"{Environment.NewLine}{Environment.NewLine}{message}{Environment.NewLine}{Environment.NewLine}"));
+        }
+
+        /// <summary>send StopWatch elapsed and message to trace output, using current culture, then reset stopwatch timer</summary>
+        /// <param name="formattable">message to log</param>
+        public static void TraceWatch(FormattableString formattable)
+        {
+            System.Diagnostics.Trace.Write(Write.Current($"{formattable?.ToString()} {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture, then reset stopwatch timer</summary>
         /// <param name="message">message to log</param>
         public static void TraceWatch(string message)
         {
-            Write.Trace($"{message} {Write.StopWatch.ElapsedMilliseconds}ms");
+            System.Diagnostics.Trace.Write(Write.Current($"{message} {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture</summary>
         public static void TraceWatch()
         {
-            Write.Trace($"elapased mm {Write.StopWatch.ElapsedMilliseconds}ms");
-        }
-
-        /// <summary>send StopWatch elapsed and message to trace output, using current culture, then reset stopwatch timer</summary>
-        /// <param name="message">message to log</param>
-        public static void TraceWatchThenReset(string message)
-        {
-            TraceWatch(message);
-            stopWatch.Reset();
-        }
-
-        /// <summary>send StopWatch elapsed to trace output, using current culture, then reset stopwatch timer</summary>
-        public static void TraceWatchThenReset()
-        {
-            TraceWatch();
-            stopWatch.Reset();
+            System.Diagnostics.Trace.Write(Write.Current($"elapased mm {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
     }
 }

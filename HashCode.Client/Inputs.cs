@@ -48,6 +48,46 @@
             }
         }
 
+        public static string OutExample
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "example.out");
+            }
+        }
+
+        public static string OutKitten
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "kittens.out");
+            }
+        }
+
+        public static string OutMeAtTheZoo
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "me_at_the_zoo.out");
+            }
+        }
+
+        public static string OutTrendingToday
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "trending_today.out");
+            }
+        }
+
+        public static string OutVideosWorthSpreading
+        {
+            get
+            {
+                return Path.Combine(Inputs.ResourcesFolder, "videos_worth_spreading.out");
+            }
+        }
+
         public static string ResourcesFolder
         {
             get

@@ -4,9 +4,9 @@
     {
         public int EndPointID;
         public int Gain;
+        public int GainPerMegaByte;
         public int VideoID;
         public int VideoSize;
-        public int GainPerMegaByte;
 
         public GainCacheServer(int endPointID, int gain, int videoID, int videoSize)
         {
