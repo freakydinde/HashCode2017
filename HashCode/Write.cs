@@ -116,6 +116,7 @@
         public static void ResetWatch()
         {
             Write.StopWatch.Reset();
+            Write.StopWatch.Start();
         }
 
         /// <summary>send message and collection flatten to string to debug output, using current culture</summary>

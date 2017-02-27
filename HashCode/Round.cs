@@ -117,8 +117,10 @@
             return new Round(cacheServers, endpoints, requests, videos);
         }
 
-        public void AssignVideosList()
+        public void AssignVideos()
         {
+            this.SetVideosList();
+
             Write.TraceWatch("starting assign videos list");
 
             Write.TraceVisible("gain cache servers");

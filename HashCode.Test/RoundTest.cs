@@ -21,18 +21,31 @@
         }
 
         [TestMethod()]
+        [Timeout(60000)]
+        public void TrendingTodayTest()
+        {
+            Write.TraceVisible("trending_today");
+
+            Round trend = Round.RoundFromFile(Inputs.InTrendingToday);
+
+            trend.AssignVideos();
+            trend.PrintAssigment(Inputs.OutTrendingToday);
+
+            Write.PrintWatch();
+            Write.ResetWatch();
+        }
+
+        [TestMethod()]
         public void AssignVideosListTest()
         {
-            RoundTests.round.SetVideosList();
-
-            RoundTests.round.AssignVideosList();
+            RoundTests.round.AssignVideos();
 
             Write.TraceWatch("videos assigned");
 
             RoundTests.round.PrintAssigment(Inputs.OutExample);
 
             string actual = File.ReadAllText(Inputs.OutExample);
-            string expected = "3\r\n0 2 \r\n1 3 1 \r\n2 0 1 ";
+            string expected = "2\r\n0 3 \r\n1 1 \r\n";
 
             Assert.AreEqual(expected, actual);
         }
