@@ -21,21 +21,6 @@
         }
 
         [TestMethod()]
-        [Timeout(60000)]
-        public void TrendingTodayTest()
-        {
-            Write.TraceVisible("trending_today");
-
-            Round trend = Round.RoundFromFile(Inputs.InTrendingToday);
-
-            trend.AssignVideos();
-            trend.PrintAssigment(Inputs.OutTrendingToday);
-
-            Write.PrintWatch();
-            Write.ResetWatch();
-        }
-
-        [TestMethod()]
         public void AssignVideosListTest()
         {
             RoundTests.round.AssignVideos();
@@ -48,6 +33,21 @@
             string expected = "2\r\n0 3 \r\n1 1 \r\n";
 
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        [Timeout(360000)]
+        public void KittenTest()
+        {
+            Write.TraceVisible("kitten");
+
+            Round trend = Round.RoundFromFile(Inputs.InKitten);
+
+            trend.AssignVideos();
+            trend.PrintAssigment(Inputs.OutKitten);
+
+            Write.PrintWatch();
+            Write.ResetWatch();
         }
 
         [TestMethod]
@@ -124,6 +124,21 @@
             expected.AppendLine("cacheServerID:2 EndPointID:0 Gain:800 VideoID:1 VideoSize:50 GainPerMegaByte:16");
 
             Assert.AreEqual(expected.ToString(), actual.ToString());
+        }
+
+        [TestMethod()]
+        [Timeout(180000)]
+        public void TrendingTodayTest()
+        {
+            Write.TraceVisible("trending_today");
+
+            Round trend = Round.RoundFromFile(Inputs.InTrendingToday);
+
+            trend.AssignVideos();
+            trend.PrintAssigment(Inputs.OutTrendingToday);
+
+            Write.PrintWatch();
+            Write.ResetWatch();
         }
     }
 }

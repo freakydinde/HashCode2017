@@ -176,34 +176,34 @@
         /// <param name="formattable">initial string as formattable</param>
         public static void TraceVisible(FormattableString formattable)
         {
-            System.Diagnostics.Trace.Write(Write.Current($"{Environment.NewLine}{Environment.NewLine}{formattable?.ToString()}{Environment.NewLine}{Environment.NewLine}"));
+            System.Diagnostics.Trace.WriteLine(Write.Current($"{Environment.NewLine}{formattable?.ToString()}{Environment.NewLine}"));
         }
 
         /// <summary>send string to debug output, using current culture</summary>
         /// <param name="message">message to log</param>
         public static void TraceVisible(string message)
         {
-            System.Diagnostics.Trace.Write(Write.Current($"{Environment.NewLine}{Environment.NewLine}{message}{Environment.NewLine}{Environment.NewLine}"));
+            System.Diagnostics.Trace.WriteLine(Write.Current($"{Environment.NewLine}{message}{Environment.NewLine}"));
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture, then reset stopwatch timer</summary>
         /// <param name="formattable">message to log</param>
         public static void TraceWatch(FormattableString formattable)
         {
-            System.Diagnostics.Trace.Write(Write.Current($"{formattable?.ToString()} {Write.StopWatch.ElapsedMilliseconds}ms"));
+            System.Diagnostics.Trace.WriteLine(Write.Current($"{formattable?.ToString()} {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture, then reset stopwatch timer</summary>
         /// <param name="message">message to log</param>
         public static void TraceWatch(string message)
         {
-            System.Diagnostics.Trace.Write(Write.Current($"{message} {Write.StopWatch.ElapsedMilliseconds}ms"));
+            System.Diagnostics.Trace.WriteLine(Write.Current($"{message} {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture</summary>
         public static void TraceWatch()
         {
-            System.Diagnostics.Trace.Write(Write.Current($"elapased mm {Write.StopWatch.ElapsedMilliseconds}ms"));
+            System.Diagnostics.Trace.WriteLine(Write.Current($"elapased mm {Write.StopWatch.ElapsedMilliseconds}ms"));
         }
     }
 }

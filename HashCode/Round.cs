@@ -125,8 +125,6 @@
 
             Write.TraceVisible("gain cache servers");
 
-            Write.TraceCollection(this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte), "\r\n");
-
             foreach (GainCacheServer gainCacheServer in from i in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte) group i by new { i.EndPointID, i.VideoID } into grp select grp.First())
             {
                 Write.TraceWatch($"\r\nprocessing gainCacheServer {gainCacheServer.ToString()}");
@@ -196,7 +194,8 @@
 
         public void SetVideosList()
         {
-            Write.TraceWatch("starting set videos list");
+            Write.ResetWatch();
+            Write.Trace("starting set videos list");
 
             // init cache servers
             foreach (CacheServer cacheServer in this.CacheServers)
@@ -204,24 +203,22 @@
                 cacheServer.Reset();
             }
 
-            Write.TraceWatch("group request and endpoint");
+            Write.TraceWatch("build extended request");
 
-            var extendedRequests = from i in this.Requests
-                                   join j in this.EndPoints on i.EndPointID equals j.ID
-                                   join k in this.Videos on i.VideoID equals k.ID
-                                   select new { i.VideoID, i.EndPointID, j.CacheServerLatencies, j.DataCenterLatency, k.Size };
-
-            foreach (var request in extendedRequests)
+            foreach (Request request in this.Requests)
             {
-                foreach (Latency latency in request.CacheServerLatencies)
-                {
-                    int gain = request.DataCenterLatency - latency.Time;
+                EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+                Video video = (from i in this.Videos where i.ID == request.VideoID select i).FirstOrDefault();
 
-                    GetCacheServer(latency.CacheServerID).GainCacheServers.Add(new GainCacheServer(request.EndPointID, gain, request.VideoID, request.Size));
+                foreach (Latency latency in endPoint.CacheServerLatencies)
+                {
+                    int gain = endPoint.DataCenterLatency - latency.Time;
+
+                    GetCacheServer(latency.CacheServerID).GainCacheServers.Add(new GainCacheServer(endPoint.ID, gain, video.ID, video.Size));
                 }
             }
 
-            Write.Invariant($"{extendedRequests}");
+            Write.TraceWatch("end set videos List");
         }
     }
 }
