@@ -6,12 +6,9 @@
     public class CacheServer
     {
         public int CurrentSize;
-        public List<int> EndPointID;
-        public List<GainCacheServer> GainCacheServers;
+        public List<int> EndPointIds;
         public int ID;
-        public bool IsFull;
         public int MaxSize;
-        public bool RefusedLastAssigment;
         public int RemainingSize;
         public List<int> VideosID;
 
@@ -19,9 +16,12 @@
         {
             this.ID = id;
             this.MaxSize = maxSize;
-            this.EndPointID = new List<int>();
+            this.EndPointIds = new List<int>();
 
-            Reset();
+            VideosID = new List<int>();
+
+            this.CurrentSize = 0;
+            this.RemainingSize = this.MaxSize;
         }
 
         /// <summary>Assign video to cache server, test if video is already assigned and if server is not full</summary>
@@ -44,8 +44,6 @@
                 }
                 else
                 {
-                    this.RefusedLastAssigment = true;
-
                     Write.Trace($"FAIL (size) assign video : {video.ID} to {this.ToString()}");
 
                     return false;
@@ -63,23 +61,10 @@
         {
             return this.VideosID.Where(x => x == videoID).Any();
         }
-
-        public void Reset()
-        {
-            VideosID = new List<int>();
-
-            GainCacheServers = new List<GainCacheServer>();
-
-            this.CurrentSize = 0;
-            this.RemainingSize = this.MaxSize;
-
-            this.IsFull = false;
-            this.RefusedLastAssigment = false;
-        }
-
+        
         public override string ToString()
         {
-            return Write.Invariant($"cacheServerID:{this.ID} CurrentSize:{this.CurrentSize} RemainingSize:{this.RemainingSize} MaxSize:{this.MaxSize} RefusedLastAssigment:{this.RefusedLastAssigment} IsFull:{this.IsFull}");
+            return Write.Invariant($"cacheServerID:{this.ID} CurrentSize:{this.CurrentSize} RemainingSize:{this.RemainingSize} MaxSize:{this.MaxSize}");
         }
     }
 }

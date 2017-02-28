@@ -11,7 +11,7 @@
 
             using (Round round = Round.RoundFromFile(Inputs.InExample))
             {         
-                round.AssignVideos(Round.AssignMode.Standard);
+                round.AssignVideos();
                 round.PrintAssigment(Inputs.OutExample);
                 round.TraceScore();
             }
@@ -20,7 +20,7 @@
 
             using (Round round = Round.RoundFromFile(Inputs.InMeAtTheZoo))
             {
-                round.AssignVideos(Round.AssignMode.Standard);
+                round.AssignVideos();
                 round.PrintAssigment(Inputs.OutMeAtTheZoo);
                 round.TraceScore();
             }
@@ -29,7 +29,7 @@
 
             using (Round round = Round.RoundFromFile(Inputs.InVideosWorthSpreading))
             {
-                round.AssignVideos(Round.AssignMode.Standard);
+                round.AssignVideos();
                 round.PrintAssigment(Inputs.OutVideosWorthSpreading);
                 round.TraceScore();
             }
@@ -38,7 +38,7 @@
 
             using (Round round = Round.RoundFromFile(Inputs.InTrendingToday))
             {
-                round.AssignVideos(Round.AssignMode.Standard);
+                round.AssignVideos();
                 round.PrintAssigment(Inputs.OutTrendingToday);
                 round.TraceScore();
             }
@@ -47,7 +47,7 @@
             
             using (Round round = Round.RoundFromFile(Inputs.InKitten))
             {
-                round.AssignVideos(Round.AssignMode.PreProcessing);
+                round.AssignVideos();
                 round.PrintAssigment(Inputs.OutKitten);
                 round.TraceScore();
             }

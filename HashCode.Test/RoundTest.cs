@@ -23,14 +23,16 @@
         [TestMethod()]
         public void AssignVideosListTest()
         {
-            RoundTests.round.AssignVideos(Round.AssignMode.Standard);
+            RoundTests.round.AssignVideos();
 
             Write.TraceWatch("videos assigned");
 
             RoundTests.round.PrintAssigment(Inputs.OutExample);
 
-            string actual = File.ReadAllText(Inputs.OutExample);
-            string expected = "2\r\n0 3 \r\n1 1 \r\n";
+            RoundTests.round.TraceScore();
+
+            string actual = File.ReadAllText(Inputs.OutExample) + RoundTests.round.Score.ToString();
+            string expected = "1\r\n0 3 1\r\n562500\r\n";
 
             Assert.AreEqual(expected, actual);
         }
