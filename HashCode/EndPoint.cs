@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public class EndPoint
     {
@@ -16,6 +17,11 @@
             this.DataCenterLatency = dataCenterLatency;
             this.CacheServerLatencies = new List<Latency>();
             this.CacheServerIds = new List<int>();
+        }
+
+        public bool IsConnectedToCacheServer(int cacheServerID)
+        {
+            return this.CacheServerIds.Where(x => x == cacheServerID).Any();
         }
     }
 }

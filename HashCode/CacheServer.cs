@@ -27,37 +27,42 @@
         /// <summary>Assign video to cache server, test if video is already assigned and if server is not full</summary>
         /// <param name="video">video to assign</param>
         /// <returns>true if assigment was possible, otherwise false</returns>
-        public bool AssignVideo(Video video)
+        public bool AssignVideo(int videoId, int videoSize)
         {
-            if (video != null && !this.VideoIsHosted(video.ID))
+            if (!this.IsVideoHost(videoId))
             {
-                if (this.CurrentSize + video.Size <= this.MaxSize)
+                if (this.CurrentSize + videoSize <= this.MaxSize)
                 {
-                    this.CurrentSize += video.Size;
-                    this.RemainingSize -= video.Size;
+                    this.CurrentSize += videoSize;
+                    this.RemainingSize -= videoSize;
 
-                    this.VideosID.Add(video.ID);
+                    this.VideosID.Add(videoId);
 
-                    Write.Trace($"SUCCESS assign video : {video.ID} to {this.ToString()}");
+                    Write.Trace($"SUCCESS assign video : {videoId} to {this.ToString()}");
 
                     return true;
                 }
                 else
                 {
-                    Write.Trace($"FAIL (size) assign video : {video.ID} to {this.ToString()}");
+                    Write.Trace($"FAIL (size) assign video : {videoId} to {this.ToString()}");
 
                     return false;
                 }
             }
             else
             {
-                Write.Trace($"FAIL (already hosted) assign video : {video.ID} to {this.ToString()}");
+                Write.Trace($"FAIL (already hosted) assign video : {videoId} to {this.ToString()}");
 
                 return false;
             }
         }
 
-        public bool VideoIsHosted(int videoID)
+        public bool IsConnectedToEndPoint(int endPointID)
+        {
+            return this.EndPointIds.Where(x => x == endPointID).Any();
+        }
+
+        public bool IsVideoHost(int videoID)
         {
             return this.VideosID.Where(x => x == videoID).Any();
         }

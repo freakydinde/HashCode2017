@@ -9,3 +9,14 @@ C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\Microsoft.VisualStudio.Quality
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.csprojResolveAssemblyReference.cache
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.dll
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.pdb
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.csprojResolveAssemblyReference.cache
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.dll
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.pdb
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\HashCode.Test.dll
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\HashCode.Test.pdb
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\HashCode.Client.exe
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\HashCode.dll
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\HashCode.Client.pdb
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\HashCode.pdb
+C:\Tfs\GitHub\HashCode2017\HashCode.Test\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml

@@ -10,7 +10,7 @@
             Write.TraceVisible("example", true);
 
             using (Round round = Round.RoundFromFile(Inputs.InExample))
-            {         
+            {
                 round.AssignVideos();
                 round.PrintAssigment(Inputs.OutExample);
                 round.TraceScore();
