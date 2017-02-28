@@ -30,7 +30,7 @@
         /// <param name="inputs">collection to flat</param>
         /// <param name="separator">string.Join separator</param>
         /// <returns>collection flatten with string.join</returns>
-        public static string Collection(IEnumerable<object> inputs, string separator)
+        public static string Collection(IEnumerable<object> inputs, string separator = ";")
         {
             if (inputs == null)
             {
@@ -44,14 +44,6 @@
             {
                 return string.Join(separator, inputs);
             }
-        }
-
-        /// <summary>flatten a inputs to string</summary>
-        /// <param name="inputs">inputs to flat</param>
-        /// <returns>inputs flatten with string.join</returns>
-        public static string Collection(IEnumerable<object> inputs)
-        {
-            return Write.Collection(inputs, ";");
         }
 
         /// <summary>Format string to invariant culture</summary>
@@ -119,9 +111,24 @@
         /// <param name="collection">collection to print after message</param>
         /// <param name="separator">string.Join separator</param>
         /// <param name="console">write message to console (default = false)</param>
-        public static void Trace(string message, IEnumerable<object> collection, string separator, bool console = false)
+        public static void Trace(IEnumerable<object> collection, string separator = ";", bool console = false)
         {
-            System.Diagnostics.Trace.WriteLine(Write.Current($"{message}{Write.Collection(collection, separator)}"));
+            System.Diagnostics.Trace.WriteLine(Write.Current($"{Write.Collection(collection, separator)}"));
+
+            if (console)
+            {
+                Console.WriteLine(Write.Current($"{Write.Collection(collection, separator)}"));
+            }
+        }
+
+        /// <summary>send message and collection flatten to string to debug output, using current culture</summary>
+        /// <param name="message">message to print</param>
+        /// <param name="collection">collection to print after message</param>
+        /// <param name="separator">string.Join separator</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void Trace(string message, IEnumerable<object> collection, string separator = ";", bool console = false)
+        {
+            System.Diagnostics.Trace.WriteLine(Write.Current($"{message}{Environment.NewLine}{Write.Collection(collection, separator)}"));
 
             if (console)
             {
@@ -134,9 +141,9 @@
         /// <param name="collection">collection to print after message</param>
         /// <param name="separator">string.Join separator</param>
         /// <param name="console">write message to console (default = false)</param>
-        public static void Trace(FormattableString message, IEnumerable<object> collection, string separator, bool console = false)
+        public static void Trace(FormattableString message, IEnumerable<object> collection, string separator = ";", bool console = false)
         {
-            Write.Trace(message, collection, separator, console);
+            Write.Trace(Write.Current(message), collection, separator, console);
         }
 
         /// <summary>send message and collection flatten to string to debug output, using current culture</summary>

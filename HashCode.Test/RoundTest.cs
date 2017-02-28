@@ -23,7 +23,7 @@
         [TestMethod()]
         public void AssignVideosListTest()
         {
-            RoundTests.round.AssignVideos(Round.AssignMode.PreProcessing);
+            RoundTests.round.AssignVideos(Round.AssignMode.Standard);
 
             Write.TraceWatch("videos assigned");
 
@@ -34,7 +34,7 @@
 
             Assert.AreEqual(expected, actual);
         }
-
+        
         [TestMethod]
         public void RoundFromExampleTest()
         {

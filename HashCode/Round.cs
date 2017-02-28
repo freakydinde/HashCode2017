@@ -14,15 +14,24 @@
         public List<Request> Requests;
         public List<Video> Videos;
 
+        public int Score;
+        public int CacheServersCapacity;
+
         /// <summary>flag : has dispose already been called</summary>
         private bool disposed = false;
 
-        public Round(List<CacheServer> cacheServers, List<EndPoint> endPoints, List<Request> requests, List<Video> videos)
+        public Round(List<CacheServer> cacheServers, List<EndPoint> endPoints, List<Request> requests, List<Video> videos, int cacheServersCapacity)
         {
             this.CacheServers = cacheServers;
             this.Videos = videos;
             this.EndPoints = endPoints;
             this.Requests = requests;
+            this.CacheServersCapacity = cacheServersCapacity;
+        }
+
+        public void TraceScore(bool resetWatch = true, bool console = true)
+        {
+            Write.TraceWatch($"score : {this.Score}, process time", resetWatch, console);
         }
 
         /// <summary>Finalizes an instance of the <see cref="MyClass"/> class.</summary>
@@ -135,7 +144,7 @@
             }
             while (nextLinesEnumerator.MoveNext());
 
-            return new Round(cacheServers, endpoints, requests, videos);
+            return new Round(cacheServers, endpoints, requests, videos, cacheServerCapacity);
         }
 
         public void AssignVideos(AssignMode mode)
@@ -205,6 +214,8 @@
 
             Write.TraceWatch($"build video assigment", true);
 
+            int cachedGain = 0;
+
             foreach (GainCacheServer gainCacheServer in gainCacheServers)
             {
                 IEnumerable<CacheServer> endpointCacheServers = from i in this.CacheServers where i.EndPointID.Where(x => x == gainCacheServer.EndPointID).Any() select i;
@@ -218,7 +229,12 @@
 
                     while (cacheServers.MoveNext())
                     {
-                        if (cacheServers.Current.AssignVideo(video)) break;
+                        if (cacheServers.Current.AssignVideo(video))
+                        {
+                            cachedGain += gainCacheServer.Gain;
+
+                            break;
+                        }
                     }
                 }
                 else
@@ -231,6 +247,8 @@
                     break;
                 }
             }
+
+            this.Score = cachedGain * 1000 / this.Requests.Count();
         }
 
         private void AssignStandard()
@@ -242,17 +260,26 @@
                 EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
                 Video video = (from i in this.Videos where i.ID == request.VideoID select i).FirstOrDefault();
 
-                foreach (Latency latency in endPoint.CacheServerLatencies)
+                if (video.Size <= this.CacheServersCapacity)
                 {
-                    int gain = endPoint.DataCenterLatency - latency.Time;
+                    foreach (Latency latency in endPoint.CacheServerLatencies)
+                    {
+                        int gain = endPoint.DataCenterLatency - latency.Time;
 
-                    GetCacheServer(latency.CacheServerID).GainCacheServers.Add(new GainCacheServer(endPoint.ID, gain, video.ID, video.Size));
+                        GainCacheServer gainCacheServer = new GainCacheServer(endPoint.ID, gain, video.ID, video.Size);
+
+                        Write.Trace(gainCacheServer.ToString());
+
+                        GetCacheServer(latency.CacheServerID).GainCacheServers.Add(gainCacheServer);
+                    }
                 }
             }
 
             Write.TraceWatch($"flatten grouped gain cache servers list", true);
 
             List<GainCacheServer> gainCacheServers = (from i in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte) group i by new { i.EndPointID, i.VideoID } into grp select grp.First()).ToList();
+
+            Write.Trace("gain cache servers grouped", gainCacheServers, Environment.NewLine);
 
             Write.TraceWatch($"release gainCacheServer object from cacheServers", true);
 
@@ -262,6 +289,8 @@
             }
 
             Write.TraceWatch($"build video assigment", true);
+
+            int cachedGain = 0;
 
             foreach (GainCacheServer gainCacheServer in gainCacheServers)
             {
@@ -276,7 +305,12 @@
 
                     while (cacheServers.MoveNext())
                     {
-                        if (cacheServers.Current.AssignVideo(video)) break;
+                        if (cacheServers.Current.AssignVideo(video))
+                        {
+                            cachedGain += gainCacheServer.Gain;
+
+                            break;
+                        }
                     }
                 }
                 else
@@ -289,6 +323,8 @@
                     break;
                 }
             }
+
+            this.Score = cachedGain * 1000 / this.Requests.Count;
         }
 
         /// <summary>Public implementation of Dispose pattern, release unmanaged & managed resources.</summary>

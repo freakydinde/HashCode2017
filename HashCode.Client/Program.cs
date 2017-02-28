@@ -13,36 +13,35 @@
             {         
                 round.AssignVideos(Round.AssignMode.Standard);
                 round.PrintAssigment(Inputs.OutExample);
+                round.TraceScore();
             }
 
-            Write.TraceWatch("process time", true, true);
             Write.TraceVisible("me_at_the_zoo", true);
 
             using (Round round = Round.RoundFromFile(Inputs.InMeAtTheZoo))
             {
                 round.AssignVideos(Round.AssignMode.Standard);
                 round.PrintAssigment(Inputs.OutMeAtTheZoo);
+                round.TraceScore();
             }
 
-            Write.TraceWatch("process time", true, true);
-            Write.TraceVisible("videos_worth_spreading");
+            Write.TraceVisible("videos_worth_spreading", true);
 
             using (Round round = Round.RoundFromFile(Inputs.InVideosWorthSpreading))
             {
                 round.AssignVideos(Round.AssignMode.Standard);
                 round.PrintAssigment(Inputs.OutVideosWorthSpreading);
+                round.TraceScore();
             }
 
-            Write.TraceWatch("process time", true, true);
             Write.TraceVisible("trending_today", true);
 
             using (Round round = Round.RoundFromFile(Inputs.InTrendingToday))
             {
                 round.AssignVideos(Round.AssignMode.Standard);
                 round.PrintAssigment(Inputs.OutTrendingToday);
+                round.TraceScore();
             }
-
-            Write.TraceWatch("process time", true, true);
 
             Write.TraceVisible("kitten", true);
             
@@ -50,6 +49,7 @@
             {
                 round.AssignVideos(Round.AssignMode.PreProcessing);
                 round.PrintAssigment(Inputs.OutKitten);
+                round.TraceScore();
             }
 
             Write.TraceWatch("boom boom boom and everybody say HEyyHOOOooO", true);
