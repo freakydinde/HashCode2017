@@ -7,12 +7,15 @@
     using System.Linq;
     using System.Text;
 
-    public class Round
+    public class Round : IDisposable
     {
         public List<CacheServer> CacheServers;
         public List<EndPoint> EndPoints;
         public List<Request> Requests;
         public List<Video> Videos;
+
+        /// <summary>flag : has dispose already been called</summary>
+        private bool disposed = false;
 
         public Round(List<CacheServer> cacheServers, List<EndPoint> endPoints, List<Request> requests, List<Video> videos)
         {
@@ -22,8 +25,22 @@
             this.Requests = requests;
         }
 
+        /// <summary>Finalizes an instance of the <see cref="MyClass"/> class.</summary>
+        ~Round()
+        {
+            this.Dispose(false);
+        }
+
+        public enum AssignMode
+        {
+            Standard = 2,
+            PreProcessing = 4,
+        }
+
         public static Round RoundFromFile(string input)
         {
+            Write.TraceWatch($"start RoundFromFile", true);
+
             IEnumerable<int[]> inputs = from i in File.ReadAllLines(input) select (from j in i.Split(' ') select Convert.ToInt32(j, CultureInfo.InvariantCulture)).ToArray();
 
             int videosNumber = inputs.ElementAt(0)[0];
@@ -32,7 +49,9 @@
             int cacheServerNumber = inputs.ElementAt(0)[3];
             int cacheServerCapacity = inputs.ElementAt(0)[4];
 
-            Write.Trace($"videosNumber {videosNumber} endpointNumber {endpointNumber} requestNumber {requestNumber} cacheServerNumber {cacheServerNumber} cacheServerCapacity {cacheServerCapacity}");
+            Write.Trace($"videosNumber {videosNumber} endpointNumber {endpointNumber} requestNumber {requestNumber} cacheServerNumber {cacheServerNumber} cacheServerCapacity {cacheServerCapacity}", true);
+
+            Write.TraceWatch($"building objects", true);
 
             int[] videoSizes = inputs.ElementAt(1);
 
@@ -99,6 +118,8 @@
                 endPointId++;
             }
 
+            Write.TraceWatch($"reading requests", true);
+
             List<Request> requests = new List<Request>();
             do
             {
@@ -117,27 +138,80 @@
             return new Round(cacheServers, endpoints, requests, videos);
         }
 
-        public void AssignVideos()
+        public void AssignVideos(AssignMode mode)
         {
-            this.SetVideosList();
+            Write.TraceWatch($"Assign Videos mode:{mode.ToString()}", true);
 
-            Write.TraceWatch("starting assign videos list");
-
-            Write.TraceVisible("gain cache servers");
-
-            foreach (GainCacheServer gainCacheServer in from i in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte) group i by new { i.EndPointID, i.VideoID } into grp select grp.First())
+            // init cache servers
+            foreach (CacheServer cacheServer in this.CacheServers)
             {
-                Write.TraceWatch($"\r\nprocessing gainCacheServer {gainCacheServer.ToString()}");
+                cacheServer.Reset();
+            }
 
+            switch (mode)
+            {
+                case AssignMode.Standard:
+
+                    AssignStandard();
+
+                    break;
+
+                case AssignMode.PreProcessing:
+
+                    AssignPreProcessing();
+
+                    break;
+            }
+        }
+
+        private void AssignPreProcessing()
+        {
+            Write.TraceWatch($"build gain cache servers list", true);
+
+            foreach (Request request in this.Requests)
+            {
+                EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+                Video video = (from i in this.Videos where i.ID == request.VideoID select i).FirstOrDefault();
+
+                GainCacheServer bestGain = new GainCacheServer(0, 0, 0, 0);
+                int cacheServerID = 0;
+
+                foreach (Latency latency in endPoint.CacheServerLatencies)
+                {
+                    int gain = endPoint.DataCenterLatency - latency.Time;
+
+                    GainCacheServer gainCacheServer = new GainCacheServer(endPoint.ID, gain, video.ID, video.Size);
+
+                    if (gainCacheServer.GainPerMegaByte > bestGain.GainPerMegaByte)
+                    {
+                        bestGain = gainCacheServer;
+                        cacheServerID = latency.CacheServerID;
+                    }
+                }
+
+                GetCacheServer(cacheServerID).GainCacheServers.Add(bestGain);
+            }
+
+            Write.TraceWatch($"flatten grouped gain cache servers list", true);
+
+            List<GainCacheServer> gainCacheServers = (from i in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte) group i by new { i.EndPointID, i.VideoID } into grp select grp.First()).ToList();
+
+            Write.TraceWatch($"release gainCacheServer object from cacheServers", true);
+
+            foreach (CacheServer cacheServer in this.CacheServers)
+            {
+                cacheServer.GainCacheServers.Clear();
+            }
+
+            Write.TraceWatch($"build video assigment", true);
+
+            foreach (GainCacheServer gainCacheServer in gainCacheServers)
+            {
                 IEnumerable<CacheServer> endpointCacheServers = from i in this.CacheServers where i.EndPointID.Where(x => x == gainCacheServer.EndPointID).Any() select i;
 
                 // test if another cache server linked to the same endpoint already host video
                 if (!endpointCacheServers.Where(x => x.VideoIsHosted(gainCacheServer.VideoID)).Any())
                 {
-                    Write.Trace("\r\ncollection : ");
-
-                    Write.TraceCollection((from i in endpointCacheServers orderby i.EndPointID.Count(), i.RemainingSize descending select i), "\r\n");
-
                     IEnumerator<CacheServer> cacheServers = (from i in endpointCacheServers orderby i.EndPointID.Count(), i.RemainingSize descending select i).GetEnumerator();
 
                     Video video = this.Videos.Where(x => x.ID == gainCacheServer.VideoID).FirstOrDefault();
@@ -159,6 +233,71 @@
             }
         }
 
+        private void AssignStandard()
+        {
+            Write.TraceWatch($"build gain cache servers list", true);
+
+            foreach (Request request in this.Requests)
+            {
+                EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+                Video video = (from i in this.Videos where i.ID == request.VideoID select i).FirstOrDefault();
+
+                foreach (Latency latency in endPoint.CacheServerLatencies)
+                {
+                    int gain = endPoint.DataCenterLatency - latency.Time;
+
+                    GetCacheServer(latency.CacheServerID).GainCacheServers.Add(new GainCacheServer(endPoint.ID, gain, video.ID, video.Size));
+                }
+            }
+
+            Write.TraceWatch($"flatten grouped gain cache servers list", true);
+
+            List<GainCacheServer> gainCacheServers = (from i in this.CacheServers.SelectMany(x => x.GainCacheServers).OrderByDescending(y => y.GainPerMegaByte) group i by new { i.EndPointID, i.VideoID } into grp select grp.First()).ToList();
+
+            Write.TraceWatch($"release gainCacheServer object from cacheServers", true);
+
+            foreach (CacheServer cacheServer in this.CacheServers)
+            {
+                cacheServer.GainCacheServers.Clear();
+            }
+
+            Write.TraceWatch($"build video assigment", true);
+
+            foreach (GainCacheServer gainCacheServer in gainCacheServers)
+            {
+                IEnumerable<CacheServer> endpointCacheServers = from i in this.CacheServers where i.EndPointID.Where(x => x == gainCacheServer.EndPointID).Any() select i;
+
+                // test if another cache server linked to the same endpoint already host video
+                if (!endpointCacheServers.Where(x => x.VideoIsHosted(gainCacheServer.VideoID)).Any())
+                {
+                    IEnumerator<CacheServer> cacheServers = (from i in endpointCacheServers orderby i.EndPointID.Count(), i.RemainingSize descending select i).GetEnumerator();
+
+                    Video video = this.Videos.Where(x => x.ID == gainCacheServer.VideoID).FirstOrDefault();
+
+                    while (cacheServers.MoveNext())
+                    {
+                        if (cacheServers.Current.AssignVideo(video)) break;
+                    }
+                }
+                else
+                {
+                    Write.Trace($"video id {gainCacheServer.VideoID} is already hosted on a endpoint cache server");
+                }
+
+                if (this.CacheServers.Where(x => x.RefusedLastAssigment == false).Count() == 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        /// <summary>Public implementation of Dispose pattern, release unmanaged & managed resources.</summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public CacheServer GetCacheServer(int id)
         {
             return (from i in this.CacheServers where i.ID == id select i).FirstOrDefault();
@@ -166,7 +305,7 @@
 
         public void PrintAssigment(string outputFile)
         {
-            Write.TraceWatch("starting print videos assigment");
+            Write.TraceWatch("printing videos assigment", true, true);
 
             StringBuilder sb = new StringBuilder();
 
@@ -192,33 +331,26 @@
             File.WriteAllText(outputFile, sb.ToString());
         }
 
-        public void SetVideosList()
+        /// <summary>Protected implementation of Dispose pattern</summary>
+        /// <param name="disposing">should i dispose managed object</param>
+        private void Dispose(bool disposing)
         {
-            Write.ResetWatch();
-            Write.Trace("starting set videos list");
-
-            // init cache servers
-            foreach (CacheServer cacheServer in this.CacheServers)
+            if (!this.disposed)
             {
-                cacheServer.Reset();
-            }
-
-            Write.TraceWatch("build extended request");
-
-            foreach (Request request in this.Requests)
-            {
-                EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
-                Video video = (from i in this.Videos where i.ID == request.VideoID select i).FirstOrDefault();
-
-                foreach (Latency latency in endPoint.CacheServerLatencies)
+                if (disposing)
                 {
-                    int gain = endPoint.DataCenterLatency - latency.Time;
-
-                    GetCacheServer(latency.CacheServerID).GainCacheServers.Add(new GainCacheServer(endPoint.ID, gain, video.ID, video.Size));
+                    // Free any managed objects here.
                 }
             }
 
-            Write.TraceWatch("end set videos List");
+            // Free any unmanaged objects here.
+            this.CacheServers = null;
+            this.EndPoints = null;
+            this.Requests = null;
+            this.Videos = null;
+
+            // set the has disposed flag to true
+            this.disposed = true;
         }
     }
 }

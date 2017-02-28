@@ -23,7 +23,7 @@
         [TestMethod()]
         public void AssignVideosListTest()
         {
-            RoundTests.round.AssignVideos();
+            RoundTests.round.AssignVideos(Round.AssignMode.PreProcessing);
 
             Write.TraceWatch("videos assigned");
 
@@ -33,21 +33,6 @@
             string expected = "2\r\n0 3 \r\n1 1 \r\n";
 
             Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod()]
-        [Timeout(360000)]
-        public void KittenTest()
-        {
-            Write.TraceVisible("kitten");
-
-            Round trend = Round.RoundFromFile(Inputs.InKitten);
-
-            trend.AssignVideos();
-            trend.PrintAssigment(Inputs.OutKitten);
-
-            Write.PrintWatch();
-            Write.ResetWatch();
         }
 
         [TestMethod]
@@ -91,54 +76,6 @@
             string expected = File.ReadAllText(Inputs.InExample);
 
             Assert.AreEqual(expected, actual.ToString());
-        }
-
-        [TestMethod]
-        public void RoundSetVideosList()
-        {
-            Write.TraceWatch("enter RoundCacheVideos");
-
-            RoundTests.round.SetVideosList();
-
-            StringBuilder actual = new StringBuilder();
-
-            foreach (CacheServer cacheServer in RoundTests.round.CacheServers)
-            {
-                foreach (GainCacheServer gain in cacheServer.GainCacheServers)
-                {
-                    actual.Append(Write.Invariant($"cacheServerID:{cacheServer.ID} "));
-                    actual.AppendLine(gain.ToString());
-                }
-            }
-
-            StringBuilder expected = new StringBuilder();
-
-            expected.AppendLine("cacheServerID:0 EndPointID:0 Gain:900 VideoID:3 VideoSize:30 GainPerMegaByte:30");
-            expected.AppendLine("cacheServerID:0 EndPointID:0 Gain:900 VideoID:4 VideoSize:110 GainPerMegaByte:8");
-            expected.AppendLine("cacheServerID:0 EndPointID:0 Gain:900 VideoID:1 VideoSize:50 GainPerMegaByte:18");
-            expected.AppendLine("cacheServerID:1 EndPointID:0 Gain:700 VideoID:3 VideoSize:30 GainPerMegaByte:23");
-            expected.AppendLine("cacheServerID:1 EndPointID:0 Gain:700 VideoID:4 VideoSize:110 GainPerMegaByte:6");
-            expected.AppendLine("cacheServerID:1 EndPointID:0 Gain:700 VideoID:1 VideoSize:50 GainPerMegaByte:14");
-            expected.AppendLine("cacheServerID:2 EndPointID:0 Gain:800 VideoID:3 VideoSize:30 GainPerMegaByte:26");
-            expected.AppendLine("cacheServerID:2 EndPointID:0 Gain:800 VideoID:4 VideoSize:110 GainPerMegaByte:7");
-            expected.AppendLine("cacheServerID:2 EndPointID:0 Gain:800 VideoID:1 VideoSize:50 GainPerMegaByte:16");
-
-            Assert.AreEqual(expected.ToString(), actual.ToString());
-        }
-
-        [TestMethod()]
-        [Timeout(180000)]
-        public void TrendingTodayTest()
-        {
-            Write.TraceVisible("trending_today");
-
-            Round trend = Round.RoundFromFile(Inputs.InTrendingToday);
-
-            trend.AssignVideos();
-            trend.PrintAssigment(Inputs.OutTrendingToday);
-
-            Write.PrintWatch();
-            Write.ResetWatch();
         }
     }
 }

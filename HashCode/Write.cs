@@ -70,48 +70,6 @@
             return formattable?.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <summary>send string to console output, using current culture</summary>
-        /// <param name="message">message to log</param>
-        public static void Print(string message)
-        {
-            Console.WriteLine(Write.Current($"{message}"));
-        }
-
-        /// <summary>send string to console output, using current culture</summary>
-        /// <param name="formattable">initial string as formattable</param>
-        public static void Print(FormattableString formattable)
-        {
-            Console.WriteLine(Write.Current(formattable));
-        }
-
-        /// <summary>flatten a inputs to string and print result</summary>
-        /// <param name="inputs">inputs to flat</param>
-        public static void PrintCollection(IEnumerable<object> inputs)
-        {
-            Console.WriteLine(Write.Collection(inputs));
-        }
-
-        /// <summary>flatten a inputs to string and print result</summary>
-        /// <param name="inputs">inputs to flat</param>
-        /// <param name="separator">string.Join separator</param>
-        public static void PrintCollection(IEnumerable<object> inputs, string separator)
-        {
-            Console.WriteLine(Write.Collection(inputs, separator));
-        }
-
-        /// <summary>send StopWatch elapsed and message to console output, using current culture</summary>
-        /// <param name="message">message to log</param>
-        public static void PrintWatch(string message)
-        {
-            Console.WriteLine(Write.Current($"{message} {Write.StopWatch.ElapsedMilliseconds}ms"));
-        }
-
-        /// <summary>send StopWatch elapsed to console output, using current culture</summary>
-        public static void PrintWatch()
-        {
-            Console.WriteLine(Write.Current($"stopwatch : {Write.StopWatch.ElapsedMilliseconds}ms"));
-        }
-
         /// <summary>Reset stopwatch singleton</summary>
         public static void ResetWatch()
         {
@@ -119,91 +77,164 @@
             Write.StopWatch.Start();
         }
 
-        /// <summary>send message and collection flatten to string to debug output, using current culture</summary>
-        /// <param name="message">message to print</param>
-        /// <param name="collection">collection to print after message</param>
-        /// <param name="separator">string.Join separator</param>
-        public static void Trace(FormattableString message, IEnumerable<object> collection, string separator)
+        /// <summary>start stopwatch</summary>
+        public static void StartWatch()
         {
-            System.Diagnostics.Trace.WriteLine(Write.Current($"{message?.ToString()}{Write.Collection(collection, separator)}"));
+            if (stopWatch == null)
+            {
+                stopWatch = new Stopwatch();
+                stopWatch.Start();
+            }
+            else
+            {
+                Write.ResetWatch();
+            }
+        }
+
+        /// <summary>send StopWatch elapsed and message to console output, using current culture</summary>
+        /// <param name="message">message to log</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void StartWatch(FormattableString message, bool console = false)
+        {
+            Write.StartWatch(Write.Current(message), console);
+        }
+
+        /// <summary>send StopWatch elapsed and message to console output, using current culture</summary>
+        /// <param name="message">message to log</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void StartWatch(string message, bool console = false)
+        {
+            System.Diagnostics.Trace.WriteLine(message);
+
+            if (console)
+            {
+                Console.WriteLine(message);
+            }
+
+            Write.StartWatch();
         }
 
         /// <summary>send message and collection flatten to string to debug output, using current culture</summary>
         /// <param name="message">message to print</param>
         /// <param name="collection">collection to print after message</param>
-        public static void Trace(FormattableString message, IEnumerable<object> collection)
-        {
-            Trace(message, collection, ";");
-        }
-
-        /// <summary>send string to debug output, using current culture</summary>
-        /// <param name="formattable">initial string as formattable</param>
-        public static void Trace(FormattableString formattable)
-        {
-            System.Diagnostics.Trace.WriteLine(Write.Current(formattable));
-        }
-
-        /// <summary>send string to debug output, using current culture</summary>
-        /// <param name="message">initial string</param>
-        public static void Trace(string message)
-        {
-            System.Diagnostics.Trace.WriteLine(message?.ToString(CultureInfo.CurrentCulture));
-        }
-
-        /// <summary>flatten a inputs to string and trace result</summary>
-        /// <param name="inputs">inputs to flat</param>
-        public static void TraceCollection(IEnumerable<object> inputs)
-        {
-            System.Diagnostics.Trace.WriteLine(Write.Collection(inputs));
-        }
-
-        /// <summary>flatten a inputs to string and trace result</summary>
-        /// <param name="inputs">inputs to flat</param>
         /// <param name="separator">string.Join separator</param>
-        public static void TraceCollection(IEnumerable<object> inputs, string separator)
+        /// <param name="console">write message to console (default = false)</param>
+        public static void Trace(string message, IEnumerable<object> collection, string separator, bool console = false)
         {
-            System.Diagnostics.Trace.WriteLine(Write.Collection(inputs, separator));
+            System.Diagnostics.Trace.WriteLine(Write.Current($"{message}{Write.Collection(collection, separator)}"));
+
+            if (console)
+            {
+                Console.WriteLine(Write.Current($"{message}{Write.Collection(collection, separator)}"));
+            }
+        }
+
+        /// <summary>send message and collection flatten to string to debug output, using current culture</summary>
+        /// <param name="message">message to print</param>
+        /// <param name="collection">collection to print after message</param>
+        /// <param name="separator">string.Join separator</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void Trace(FormattableString message, IEnumerable<object> collection, string separator, bool console = false)
+        {
+            Write.Trace(message, collection, separator, console);
+        }
+
+        /// <summary>send message and collection flatten to string to debug output, using current culture</summary>
+        /// <param name="message">message to print</param>
+        /// <param name="collection">collection to print after message</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void Trace(FormattableString message, IEnumerable<object> collection, bool console = false)
+        {
+            Write.Trace(message, collection, ";", console);
+        }
+
+        /// <summary>send string to debug output, using current culture</summary>
+        /// <param name="message">initial string as formattable</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void Trace(string message, bool console = false)
+        {
+            System.Diagnostics.Trace.WriteLine(message);
+
+            if (console)
+            {
+                Console.WriteLine(message);
+            }
         }
 
         /// <summary>send string to debug output, using current culture</summary>
         /// <param name="formattable">initial string as formattable</param>
-        public static void TraceInline(FormattableString formattable)
+        /// <param name="console">write message to console (default = false)</param>
+        public static void Trace(FormattableString formattable, bool console = false)
         {
-            System.Diagnostics.Trace.Write(Write.Current(formattable));
+            Write.Trace(Write.Current(formattable), console);
+        }
+
+        /// <summary>send string to debug output, using current culture</summary>
+        /// <param name="mesage">message to log</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void TraceInline(string message, bool console = false)
+        {
+            System.Diagnostics.Trace.Write(message);
+
+            if (console)
+            {
+                Console.Write(message);
+            }
         }
 
         /// <summary>send string to debug output, using current culture</summary>
         /// <param name="formattable">initial string as formattable</param>
-        public static void TraceVisible(FormattableString formattable)
+        /// <param name="console">write message to console (default = false)</param>
+        public static void TraceInline(FormattableString formattable, bool console = false)
         {
-            System.Diagnostics.Trace.WriteLine(Write.Current($"{Environment.NewLine}{formattable?.ToString()}{Environment.NewLine}"));
+            Write.TraceInline(Write.Current(formattable), console);
+        }
+
+        /// <summary>send string to debug output, using current culture</summary>
+        /// <param name="formattable">initial string as formattable</param>
+        /// <param name="console">write message to console (default = false)</param>
+        public static void TraceVisible(FormattableString formattable, bool console = false)
+        {
+            Write.Trace($"{Environment.NewLine}{formattable}{Environment.NewLine}", console);
         }
 
         /// <summary>send string to debug output, using current culture</summary>
         /// <param name="message">message to log</param>
-        public static void TraceVisible(string message)
+        /// <param name="console">write message to console (default = false)</param>
+        public static void TraceVisible(string message, bool console = false)
         {
-            System.Diagnostics.Trace.WriteLine(Write.Current($"{Environment.NewLine}{message}{Environment.NewLine}"));
+            Write.Trace($"{Environment.NewLine}{message}{Environment.NewLine}", console);
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture, then reset stopwatch timer</summary>
         /// <param name="formattable">message to log</param>
-        public static void TraceWatch(FormattableString formattable)
+        /// <param name="console">write message to console (default = false)</param>
+        /// <param name="resetWatch">should i reset watch after message</param>
+        public static void TraceWatch(FormattableString formattable, bool console = false, bool resetWatch = false)
         {
-            System.Diagnostics.Trace.WriteLine(Write.Current($"{formattable?.ToString()} {Write.StopWatch.ElapsedMilliseconds}ms"));
+            Write.TraceWatch(Write.Current(formattable), console, resetWatch);
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture, then reset stopwatch timer</summary>
         /// <param name="message">message to log</param>
-        public static void TraceWatch(string message)
+        /// <param name="console">write message to console (default = false)</param>
+        /// <param name="resetWatch">should i reset watch after message</param>
+        public static void TraceWatch(string message, bool console = false, bool resetWatch = false)
         {
-            System.Diagnostics.Trace.WriteLine(Write.Current($"{message} {Write.StopWatch.ElapsedMilliseconds}ms"));
+            Write.Trace(Write.Current($"{message} {Write.StopWatch.ElapsedMilliseconds}ms"), console);
+
+            if (resetWatch)
+            {
+                Write.ResetWatch();
+            }
         }
 
         /// <summary>send StopWatch elapsed and message to trace output, using current culture</summary>
-        public static void TraceWatch()
+        /// <param name="console">write message to console (default = false)</param>
+        /// <param name="resetWatch">should i reset watch after message</param>
+        public static void TraceWatch(bool console = false, bool resetWatch = false)
         {
-            System.Diagnostics.Trace.WriteLine(Write.Current($"elapased mm {Write.StopWatch.ElapsedMilliseconds}ms"));
+            Write.TraceWatch(Write.Current($"{Write.StopWatch.ElapsedMilliseconds}ms"), console, resetWatch);
         }
     }
 }

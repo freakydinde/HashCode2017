@@ -13,7 +13,7 @@ Get-ChildItem -Path $solutionFolder -File -Recurse -Hidden | ? { $_.Name.EndsWit
 # zip codes files
 $csFiles = $solutionFolder | Get-ChildItem -Filter *.cs -Exclude Temp* -Recurse
 $psFiles = $solutionFolder| Get-ChildItem -Filter *.ps1 -Exclude "Compress-CodeFiles.ps1" -Recurse
-$dllFiles = $solutionFolder | Get-ChildItem -Filter *.dll -Recurse
+# $dllFiles = $solutionFolder | Get-ChildItem -Filter *.dll -Recurse
 
 $codeFilesFolder = [IO.Path]::Combine($PSScriptRoot, "Code")
 $zipFile = [IO.Path]::Combine($PSScriptRoot, "Code.zip")

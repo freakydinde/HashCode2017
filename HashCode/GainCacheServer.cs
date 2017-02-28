@@ -15,7 +15,14 @@
             this.VideoID = videoID;
             this.VideoSize = videoSize;
 
-            this.GainPerMegaByte = this.Gain / this.VideoSize;
+            if (this.VideoID != 0 && this.Gain != 0)
+            {
+                this.GainPerMegaByte = this.Gain / this.VideoSize;
+            }
+            else
+            {
+                this.GainPerMegaByte = 0;
+            }
         }
 
         /// <summary>Gets a string representation of the current object</summary>
