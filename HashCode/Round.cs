@@ -281,7 +281,7 @@
 
             foreach (GainCacheServer gainCacheServer in from i in gainCacheServers.OrderByDescending(y => y.GainPerMegaByte) group i by new { i.EndPointID, i.VideoID } into grp select grp.First())
             {
-                Write.TraceWatch($"\r\nprocessing gainCacheServer {gainCacheServer.ToString()}");
+                Write.TraceWatch($"processing gainCacheServer {gainCacheServer.ToString()}");
 
                 IEnumerable<CacheServer> endpointCacheServers = from i in this.CacheServers where i.IsConnectedToEndPoint(gainCacheServer.EndPointID) select i;
 
@@ -297,7 +297,7 @@
                         {
                             this.Score += gainCacheServer.Gain;
 
-                            Write.Trace($"score += {gainCacheServer.Gain} = {this.Score}");
+                            Write.TraceWatch($"score += {gainCacheServer.Gain} = {this.Score}");
 
                             break;
                         }

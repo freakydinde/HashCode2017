@@ -146,15 +146,6 @@
             Write.Trace(Write.Current(message), collection, separator, console);
         }
 
-        /// <summary>send message and collection flatten to string to debug output, using current culture</summary>
-        /// <param name="message">message to print</param>
-        /// <param name="collection">collection to print after message</param>
-        /// <param name="console">write message to console (default = false)</param>
-        public static void Trace(FormattableString message, IEnumerable<object> collection, bool console = false)
-        {
-            Write.Trace(message, collection, ";", console);
-        }
-
         /// <summary>send string to debug output, using current culture</summary>
         /// <param name="message">initial string as formattable</param>
         /// <param name="console">write message to console (default = false)</param>
