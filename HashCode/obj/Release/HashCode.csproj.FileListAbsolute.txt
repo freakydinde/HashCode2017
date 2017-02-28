@@ -1,5 +1,0 @@
-C:\Tfs\Git\HashCode2017\HashCode\bin\Release\HashCode.dll
-C:\Tfs\Git\HashCode2017\HashCode\bin\Release\HashCode.pdb
-C:\Tfs\Git\HashCode2017\HashCode\obj\Release\HashCode.dll
-C:\Tfs\Git\HashCode2017\HashCode\obj\Release\HashCode.pdb
-C:\Tfs\Git\HashCode2017\HashCode\obj\Release\HashCode.csprojResolveAssemblyReference.cache
