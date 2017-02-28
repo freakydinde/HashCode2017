@@ -8,10 +8,10 @@
 /HashCode.Client/obj/Debug
 /HashCode.Tests/bin/Debug
 /HashCode.Tests/obj/Debug
-#/HashCode/bin/Release
-#/HashCode/obj/Release
-#/HashCode.Client/bin/Release
-#/HashCode.Client/obj/Release
-#/HashCode.Tests/bin/Release
-#/HashCode.Tests/obj/Release
-#/HashCode/desktop.ini
+/HashCode/bin/Release
+/HashCode/obj/Release
+/HashCode.Client/bin/Release
+/HashCode.Client/obj/Release
+/HashCode.Tests/bin/Release
+/HashCode.Tests/obj/Release
+/HashCode/desktop.ini
