@@ -1,5 +1,11 @@
-<# 
-
+<#
+.Remarks
+post build event command line : %SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -File $(SolutionDir)\Resources\Initialize-BuildResult.ps1
+ 
+.Notes
+    fileName    : Copy-ToOuput.ps1
+    version        : 0.002
+    author        : Armand Lacore
 #>
 Param ()
 

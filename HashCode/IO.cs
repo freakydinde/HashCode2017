@@ -11,7 +11,7 @@
     {
         public static IEnumerable<int[]> NumberLines(string input)
         {
-            return from i in File.ReadAllLines(input) select (from j in i.Split(' ') select Convert.ToInt32(j, CultureInfo.InvariantCulture)).ToArray();
+            return from i in File.ReadAllLines(input) select (from j in i.TrimEnd().Split(' ') select Convert.ToInt32(j, CultureInfo.InvariantCulture)).ToArray();
         }
     }
 

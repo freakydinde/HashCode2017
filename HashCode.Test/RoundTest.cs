@@ -20,6 +20,19 @@
             RoundTests.round = Round.RoundFromFile(Inputs.InExample);
         }
 
+        [TestMethod]
+        public void MeAtTheZooTest()
+        {
+            Write.TraceVisible("me_at_the_zoo", true);
+
+            using (Round round = Round.RoundFromFile(Inputs.InMeAtTheZoo))
+            {
+                round.AssignVideos();
+                round.PrintAssigment(Inputs.OutMeAtTheZoo);
+                if (round.ComputeScore(Inputs.OutMeAtTheZoo)) round.TraceScore();
+            }
+        }
+
         [TestMethod()]
         public void AssignVideosListTest()
         {

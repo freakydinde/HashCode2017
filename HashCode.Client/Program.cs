@@ -13,7 +13,7 @@
             {
                 round.AssignVideos();
                 round.PrintAssigment(Inputs.OutExample);
-                round.TraceScore();
+                if (round.ComputeScore(Inputs.OutExample)) round.TraceScore();
             }
 
             Write.TraceVisible("me_at_the_zoo", true);
@@ -22,7 +22,7 @@
             {
                 round.AssignVideos();
                 round.PrintAssigment(Inputs.OutMeAtTheZoo);
-                round.TraceScore();
+                if (round.ComputeScore(Inputs.OutMeAtTheZoo)) round.TraceScore();
             }
 
             Write.TraceVisible("videos_worth_spreading", true);
@@ -31,7 +31,7 @@
             {
                 round.AssignVideos();
                 round.PrintAssigment(Inputs.OutVideosWorthSpreading);
-                round.TraceScore();
+                if (round.ComputeScore(Inputs.OutVideosWorthSpreading)) round.TraceScore();
             }
 
             Write.TraceVisible("trending_today", true);
@@ -40,7 +40,7 @@
             {
                 round.AssignVideos();
                 round.PrintAssigment(Inputs.OutTrendingToday);
-                round.TraceScore();
+                if (round.ComputeScore(Inputs.OutTrendingToday)) round.TraceScore();
             }
 
             Write.TraceVisible("kitten", true);
@@ -49,7 +49,7 @@
             {
                 round.AssignVideos();
                 round.PrintAssigment(Inputs.OutKitten);
-                round.TraceScore();
+                if (round.ComputeScore(Inputs.OutKitten)) round.TraceScore();
             }
 
             Write.TraceWatch("boom boom boom and everybody say HEyyHOOOooO", true);

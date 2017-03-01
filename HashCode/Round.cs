@@ -35,45 +35,55 @@
             this.Dispose(false);
         }
 
-        public static int FilesScore(string input, string ouput)
+        public bool ComputeScore(string input)
         {
-            using (Round round = Round.RoundFromFile(input))
+            IEnumerable<int[]> outputs = Read.NumberLines(input);
+
+            this.Score = 0;
+
+            int requestsNumber = this.Requests.Count();
+            int usedCacheServersNumber = outputs.ElementAt(0)[0];
+
+            Write.Trace($"requestsNumber:{requestsNumber} usedCacheServersNumber:{usedCacheServersNumber}");
+
+            foreach (int[] line in outputs.Skip(1))
             {
-                IEnumerable<int[]> outputs = Read.NumberLines(input);
+                CacheServer cacheServer = (from i in this.CacheServers where i.ID == line[0] select i).FirstOrDefault();
 
-                double score = 0;
-
-                int requestsNumber = round.Requests.Count();
-                int usedCacheServersNumber = outputs.ElementAt(0)[0];
-
-                foreach (int[] line in outputs.Skip(1))
+                foreach (int videoID in line.Skip(1))
                 {
-                    CacheServer cacheServer = (from i in round.CacheServers where i.ID == line[0] select i).FirstOrDefault();
+                    Video video = (from i in this.Videos where i.ID == videoID select i).FirstOrDefault();
 
-                    foreach (int videoID in line.Skip(1))
+                    if (cacheServer.AssignVideo(videoID, video.Size))
                     {
-                        Video video = (from i in round.Videos where i.ID == videoID select i).FirstOrDefault();
-
-                        if (cacheServer.AssignVideo(videoID, video.Size))
+                        foreach (Request request in from i in this.Requests where i.VideoID == videoID select i)
                         {
-                            foreach(Request request in from i in round.Requests where i.VideoID == videoID select i)
-                            {
-                                EndPoint endPoint = (from i in round.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+                            EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
 
-                                int latency = (from i in endPoint.CacheServerLatencies where i.CacheServerID == cacheServer.ID select i.Time).FirstOrDefault();
+                            int latency = (from i in endPoint.CacheServerLatencies where i.CacheServerID == cacheServer.ID select i.Time).FirstOrDefault();
 
-                                score += latency * request.Occurency;
-                            }
+                            this.Score += latency * request.Occurency;
+                        }
+                    }
+                    else
+                    {
+                        if (cacheServer.IsVideoHost(videoID))
+                        {
+                            Write.Trace($"Error: Video {videoID} is already hosted on cache server {cacheServer.ID}", true);
                         }
                         else
                         {
-                            throw new Exception($"Error: Video {videoID} does not fit in the cache {cacheServer.ID}.");
+                            Write.Trace($"Error: Video {videoID} does not fit in the cache server {cacheServer.ID}", true);
                         }
+
+                        return false;
                     }
                 }
-
-                score = Math.Round(score * 1000 / requestsNumber);
             }
+
+            this.Score = Math.Round(this.Score * 1000 / requestsNumber);
+
+            return true;
         }
 
         public static Round RoundFromFile(string input)
@@ -182,8 +192,6 @@
         {
             this.AssignVideosBestGain();
             this.AssignVideosLeft();
-
-            this.Score = Math.Round(this.Score * 1000 / this.Requests.Sum(x => x.Occurency), 0);
         }
 
         public void AssignVideosBestGain()
