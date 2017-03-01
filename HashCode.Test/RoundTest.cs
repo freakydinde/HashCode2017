@@ -55,42 +55,43 @@
         {
             Write.TraceWatch("enter RoundFromExampleTest");
 
-            StringBuilder actual = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
-            actual.Append(Write.Invariant($"{round.Videos.Count} {round.EndPoints.Count} {round.Requests.Count} {round.CacheServers.Count()} {round.CacheServers[0].MaxSize}\n"));
+            stringBuilder.AppendLine(Write.Invariant($"{round.Videos.Count} {round.EndPoints.Count} {round.Requests.Count} {round.CacheServers.Count()} {round.CacheServers[0].MaxSize}"));
 
             for (int i = 0; i < round.Videos.Count; i++)
             {
-                actual.Append(round.Videos[i].Size);
+                stringBuilder.Append(round.Videos[i].Size);
 
                 if (i + 1 < round.Videos.Count)
                 {
-                    actual.Append(" ");
+                    stringBuilder.Append(" ");
                 }
                 else
                 {
-                    actual.Append('\n');
+                    stringBuilder.AppendLine();
                 }
             }
 
             foreach (EndPoint endpoint in round.EndPoints)
             {
-                actual.Append(Write.Invariant($"{endpoint.DataCenterLatency} {endpoint.CacheServerLatencies.Count}\n"));
+                stringBuilder.AppendLine(Write.Invariant($"{endpoint.DataCenterLatency} {endpoint.CacheServerLatencies.Count}"));
 
                 foreach (Latency latency in endpoint.CacheServerLatencies)
                 {
-                    actual.Append(Write.Invariant($"{latency.CacheServerID} {latency.Time}\n"));
+                    stringBuilder.AppendLine(Write.Invariant($"{latency.CacheServerID} {latency.Time}"));
                 }
             }
 
             foreach (Request request in round.Requests)
             {
-                actual.Append(Write.Invariant($"{request.VideoID} {request.EndPointID} {request.Occurency}\n"));
+                stringBuilder.AppendLine(Write.Invariant($"{request.VideoID} {request.EndPointID} {request.Occurency}"));
             }
 
             string expected = File.ReadAllText(Inputs.InExample);
+            string actual = stringBuilder.ToString();
 
-            Assert.AreEqual(expected, actual.ToString());
+            Assert.AreEqual(expected, actual);
         }
     }
 }

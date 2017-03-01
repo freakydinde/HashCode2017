@@ -12,5 +12,12 @@
             this.Occurency = occurency;
             this.VideoID = videoID;
         }
+
+        /// <summary>Gets a string representation of the current object</summary>
+        /// <returns>this as <see cref="string"/></returns>
+        public override string ToString()
+        {
+            return Write.Invariant($"EndPointID:{this.EndPointID} Occurency:{this.Occurency} VideoID:{this.VideoID}");
+        }
     }
 }

@@ -17,7 +17,7 @@
             this.VideoID = videoID;
             this.VideoSize = videoSize;
 
-            if (this.VideoID != 0 && this.Gain != 0)
+            if (this.VideoSize != 0)
             {
                 this.GainPerMegaByte = this.Gain / this.VideoSize;
             }

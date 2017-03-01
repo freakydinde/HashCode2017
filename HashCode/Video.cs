@@ -11,5 +11,12 @@
             this.ID = id;
             this.Size = size;
         }
+
+        /// <summary>Gets a string representation of the current object</summary>
+        /// <returns>this as <see cref="string"/></returns>
+        public override string ToString()
+        {
+            return Write.Invariant($"ID:{this.ID} Size:{this.Size}");
+        }
     }
 }
