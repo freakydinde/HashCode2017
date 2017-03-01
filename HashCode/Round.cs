@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -30,20 +29,51 @@
             this.Score = 0;
         }
 
+        /// <summary>Finalizes an instance of the <see cref="Round"/> class.</summary>
+        ~Round()
+        {
+            this.Dispose(false);
+        }
+
         public static int FilesScore(string input, string ouput)
         {
             using (Round round = Round.RoundFromFile(input))
             {
                 IEnumerable<int[]> outputs = Read.NumberLines(input);
 
-                int 
-            }
-        }
+                double score = 0;
 
-        /// <summary>Finalizes an instance of the <see cref="Round"/> class.</summary>
-        ~Round()
-        {
-            this.Dispose(false);
+                int requestsNumber = round.Requests.Count();
+                int usedCacheServersNumber = outputs.ElementAt(0)[0];
+
+                foreach (int[] line in outputs.Skip(1))
+                {
+                    CacheServer cacheServer = (from i in round.CacheServers where i.ID == line[0] select i).FirstOrDefault();
+
+                    foreach (int videoID in line.Skip(1))
+                    {
+                        Video video = (from i in round.Videos where i.ID == videoID select i).FirstOrDefault();
+
+                        if (cacheServer.AssignVideo(videoID, video.Size))
+                        {
+                            foreach(Request request in from i in round.Requests where i.VideoID == videoID select i)
+                            {
+                                EndPoint endPoint = (from i in round.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+
+                                int latency = (from i in endPoint.CacheServerLatencies where i.CacheServerID == cacheServer.ID select i.Time).FirstOrDefault();
+
+                                score += latency * request.Occurency;
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception($"Error: Video {videoID} does not fit in the cache {cacheServer.ID}.");
+                        }
+                    }
+                }
+
+                score = Math.Round(score * 1000 / requestsNumber);
+            }
         }
 
         public static Round RoundFromFile(string input)
