@@ -30,7 +30,17 @@
             this.Score = 0;
         }
 
-        /// <summary>Finalizes an instance of the <see cref="MyClass"/> class.</summary>
+        public static int FilesScore(string input, string ouput)
+        {
+            using (Round round = Round.RoundFromFile(input))
+            {
+                IEnumerable<int[]> outputs = Read.NumberLines(input);
+
+                int 
+            }
+        }
+
+        /// <summary>Finalizes an instance of the <see cref="Round"/> class.</summary>
         ~Round()
         {
             this.Dispose(false);
@@ -40,7 +50,7 @@
         {
             Write.TraceWatch("start RoundFromFile", true);
 
-            IEnumerable<int[]> inputs = from i in File.ReadAllLines(input) select (from j in i.Split(' ') select Convert.ToInt32(j, CultureInfo.InvariantCulture)).ToArray();
+            IEnumerable<int[]> inputs = Read.NumberLines(input);
 
             int videosNumber = inputs.ElementAt(0)[0];
             int endpointNumber = inputs.ElementAt(0)[1];
