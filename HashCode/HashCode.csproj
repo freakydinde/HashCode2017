@@ -36,7 +36,6 @@
     <Compile Include="CacheServer.cs" />
     <Compile Include="EndPoint.cs" />
     <Compile Include="GainCacheServer.cs" />
-    <Compile Include="Latency.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="Round.cs" />

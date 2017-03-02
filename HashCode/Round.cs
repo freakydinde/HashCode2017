@@ -8,17 +8,17 @@
 
     public class Round : IDisposable
     {
-        public List<CacheServer> CacheServers;
+        public Dictionary<int, CacheServer> CacheServers;
         public int CacheServersCapacity;
-        public List<EndPoint> EndPoints;
+        public Dictionary<int, EndPoint> EndPoints;
         public List<Request> Requests;
         public double Score;
-        public List<Video> Videos;
+        public Dictionary<int, Video> Videos;
 
         /// <summary>flag : has dispose already been called</summary>
         private bool disposed = false;
 
-        public Round(List<CacheServer> cacheServers, List<EndPoint> endPoints, List<Request> requests, List<Video> videos, int cacheServersCapacity)
+        public Round(Dictionary<int, CacheServer> cacheServers, Dictionary<int, EndPoint> endPoints, List<Request> requests, Dictionary<int, Video> videos, int cacheServersCapacity)
         {
             this.CacheServers = cacheServers;
             this.Videos = videos;
@@ -37,7 +37,8 @@
 
         public static Round RoundFromFile(string input)
         {
-            Write.TraceWatch("start RoundFromFile", true);
+            Write.ResetWatch();
+            Write.TraceInline("Read input file", true);
 
             IEnumerable<int[]> inputs = Read.NumberLines(input);
 
@@ -47,31 +48,29 @@
             int cacheServerNumber = inputs.ElementAt(0)[3];
             int cacheServerCapacity = inputs.ElementAt(0)[4];
 
-            Write.Trace($"videosNumber {videosNumber} endpointNumber {endpointNumber} requestNumber {requestNumber} cacheServerNumber {cacheServerNumber} cacheServerCapacity {cacheServerCapacity}", true);
-
-            Write.TraceWatch("building objects", true);
+            Write.Trace($"videosNumber {videosNumber} endpointNumber {endpointNumber} requestNumber {requestNumber} cacheServerNumber {cacheServerNumber} cacheServerCapacity {cacheServerCapacity}");
 
             int[] videoSizes = inputs.ElementAt(1);
 
             int videoIndex = 0;
 
-            List<Video> videos = new List<Video>();
+            Dictionary<int, Video> videos = new Dictionary<int, Video>();
             foreach (int size in videoSizes)
             {
-                videos.Add(new Video(videoIndex, size));
+                videos.Add(videoIndex, new Video(size));
 
                 videoIndex++;
             }
 
-            List<CacheServer> cacheServers = new List<CacheServer>();
+            Dictionary<int, CacheServer> cacheServers = new Dictionary<int, CacheServer>();
             for (int cacheServerIndex = 0; cacheServerIndex < cacheServerNumber; cacheServerIndex++)
             {
-                cacheServers.Add(new CacheServer(cacheServerIndex, cacheServerCapacity));
+                cacheServers.Add(cacheServerIndex, new CacheServer(cacheServerCapacity));
             }
 
             IEnumerator<int[]> nextLinesEnumerator = inputs.Skip(2).GetEnumerator();
 
-            List<EndPoint> endpoints = new List<EndPoint>();
+            Dictionary<int, EndPoint> endpoints = new Dictionary<int, EndPoint>();
 
             int endPointId = 0;
             while (nextLinesEnumerator.MoveNext())
@@ -87,9 +86,9 @@
                 int dataCenterLatency = firstLine[0];
                 int dataCenterNumber = firstLine[1];
 
-                EndPoint endpoint = new EndPoint(endPointId, dataCenterLatency);
+                EndPoint endpoint = new EndPoint(dataCenterLatency);
 
-                List<Latency> latencies = new List<Latency>();
+                Dictionary<int, int> latencies = new Dictionary<int, int>();
 
                 for (int i = 0; i < dataCenterNumber; i++)
                 {
@@ -102,14 +101,12 @@
                     cacheServers[cacheServerId].EndPointIds.Add(endPointId);
 
                     endpoint.CacheServerIds.Add(cacheServerId);
-                    endpoint.CacheServerLatencies.Add(new Latency(cacheServerId, cacheServerLatency));
+                    endpoint.CacheServerLatencies.Add(cacheServerId, cacheServerLatency);
                 }
 
-                endpoints.Add(endpoint);
+                endpoints.Add(endPointId, endpoint);
                 endPointId++;
             }
-
-            Write.TraceWatch("reading requests", true);
 
             List<Request> requests = new List<Request>();
             do
@@ -124,6 +121,8 @@
             }
             while (nextLinesEnumerator.MoveNext());
 
+            Write.TraceWatch(" : ");
+
             return new Round(cacheServers, endpoints, requests, videos, cacheServerCapacity);
         }
 
@@ -135,32 +134,33 @@
 
         public void AssignVideosBestGain()
         {
-            Write.TraceWatch("AssignVideos BestGain : build gain cache servers list", true);
+            Write.ResetWatch();
+            Write.TraceInline("AssignVideos BestGain : build gain cache servers list", true);
 
             List<GainCacheServer> gainCacheServers = new List<GainCacheServer>();
 
             foreach (Request request in this.Requests)
             {
-                EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+                EndPoint endPoint = this.EndPoints[request.EndPointID];
 
                 if (endPoint.CacheServerIds.Any())
                 {
-                    Video video = (from i in this.Videos where i.ID == request.VideoID select i).FirstOrDefault();
+                    Video video = this.Videos[request.VideoID];
 
                     GainCacheServer bestGain = new GainCacheServer(0, 0, 0, 0, 0);
-                    int cacheServerID = 0;
+                    int bestCacheServerID = 0;
 
                     if (video.Size <= this.CacheServersCapacity)
                     {
-                        foreach (Latency latency in endPoint.CacheServerLatencies)
+                        foreach (int cacheServerID in endPoint.CacheServerIds)
                         {
-                            int gain = (endPoint.DataCenterLatency - latency.Time) * request.Occurency;
-                            GainCacheServer gainCacheServer = new GainCacheServer(endPoint.ID, latency.CacheServerID, gain, video.ID, video.Size);
+                            int gain = (endPoint.DataCenterLatency - endPoint.CacheServerLatencies[cacheServerID]) * request.Occurency;
+                            GainCacheServer gainCacheServer = new GainCacheServer(request.EndPointID, cacheServerID, gain, request.VideoID, video.Size);
 
                             if (gainCacheServer.GainPerMegaByte >= bestGain.GainPerMegaByte)
                             {
                                 bestGain = gainCacheServer;
-                                cacheServerID = latency.CacheServerID;
+                                bestCacheServerID = cacheServerID;
                             }
                         }
 
@@ -177,32 +177,34 @@
                 }
             }
 
+            Write.TraceWatch(" : ");
+
             ProcessAssign(from i in gainCacheServers.OrderByDescending(y => y.GainPerMegaByte) group i by new { i.VideoID, i.EndPointID } into grp orderby grp.Count() select grp.First());
         }
 
         public void AssignVideosLeft()
         {
-            Write.TraceWatch("AssignVideos Left : build gain cache servers list", true);
+            Write.ResetWatch();
+            Write.TraceInline("AssignVideos Left : build gain cache servers list", true);
 
             List<GainCacheServer> gainCacheServers = new List<GainCacheServer>();
 
             foreach (Request request in this.Requests)
             {
-                EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+                EndPoint endPoint = this.EndPoints[request.EndPointID];
 
-                IEnumerable<CacheServer> endPointCacheServer = from i in this.CacheServers where endPoint.CacheServerIds.Where(x => x == i.ID).Any() select i;
+                IEnumerable<CacheServer> endPointCacheServer = from i in endPoint.CacheServerIds select this.CacheServers[i];
 
                 if (endPointCacheServer.Any() && !endPointCacheServer.Where(x => x.IsVideoHost(request.VideoID)).Any())
                 {
-                    Video video = (from i in this.Videos where i.ID == request.VideoID select i).FirstOrDefault();
+                    Video video = this.Videos[request.VideoID];
 
                     if (video.Size <= this.CacheServersCapacity)
                     {
-                        foreach (Latency latency in endPoint.CacheServerLatencies)
+                        foreach (int cacheServerID in endPoint.CacheServerIds)
                         {
-                            int gain = (endPoint.DataCenterLatency - latency.Time) * request.Occurency;
-
-                            GainCacheServer gainCacheServer = new GainCacheServer(endPoint.ID, latency.CacheServerID, gain, video.ID, video.Size);
+                            int gain = (endPoint.DataCenterLatency - endPoint.CacheServerLatencies[cacheServerID]) * request.Occurency;
+                            GainCacheServer gainCacheServer = new GainCacheServer(request.EndPointID, cacheServerID, gain, request.VideoID, video.Size);
 
                             gainCacheServers.Add(gainCacheServer);
                         }
@@ -225,11 +227,16 @@
                 }
             }
 
+            Write.TraceWatch(" : ");
+
             ProcessAssign(gainCacheServers.OrderByDescending(y => y.GainPerMegaByte));
         }
 
         public bool ComputeScore(string input)
         {
+            Write.ResetWatch();
+            Write.TraceInline("Compute score", true);
+
             IEnumerable<int[]> outputs = Read.NumberLines(input);
 
             this.Score = 0;
@@ -237,28 +244,31 @@
 
             int usedCacheServersNumber = outputs.ElementAt(0)[0];
 
-            foreach(CacheServer cacheServer in this.CacheServers)
+            foreach (CacheServer cacheServer in this.CacheServers.Values)
             {
                 cacheServer.Reset();
             }
 
             foreach (int[] line in outputs.Skip(1))
             {
-                CacheServer cacheServer = (from i in this.CacheServers where i.ID == line[0] select i).FirstOrDefault();
+                int cacheServerID = line[0];
+
+                CacheServer cacheServer = this.CacheServers[cacheServerID];
 
                 foreach (int videoID in line.Skip(1))
                 {
-                    Video video = (from i in this.Videos where i.ID == videoID select i).FirstOrDefault();
+                    Video video = this.Videos[videoID];
 
                     if (cacheServer.AssignVideo(videoID, video.Size))
                     {
+#warning optimisation needed
                         foreach (Request request in from i in this.Requests where i.VideoID == videoID select i)
                         {
-                            EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
+                            EndPoint endPoint = this.EndPoints[request.EndPointID];
 
-                            if (endPoint.IsConnectedToCacheServer(cacheServer.ID))
+                            if (endPoint.IsConnectedToCacheServer(cacheServerID))
                             {
-                                int cacheServerLatency = (from i in endPoint.CacheServerLatencies where i.CacheServerID == cacheServer.ID select i.Time).FirstOrDefault();
+                                int cacheServerLatency = endPoint.CacheServerLatencies[cacheServerID];
                                 int gain = (endPoint.DataCenterLatency - cacheServerLatency) * request.Occurency;
 
                                 this.Score += gain;
@@ -267,12 +277,14 @@
                     }
                     else
                     {
-                        Write.TraceVisible($"ERROR, video {video.ID} to datacacheServer {cacheServer.ID} (alreadyHosted or cacheServer full, ouput is INVALID");
+                        Write.TraceVisible($"ERROR, video {videoID} to datacacheServer {cacheServerID} (alreadyHosted or cacheServer full, ouput is INVALID");
                     }
                 }
             }
 
             this.Score = Math.Round(this.Score * 1000 / requestsNumber);
+
+            Write.TraceWatch(" : ");
 
             return true;
         }
@@ -286,19 +298,21 @@
 
         public void PrintAssigment(string outputFile)
         {
-            Write.TraceWatch("printing videos assigment", true);
+            Write.ResetWatch();
+            Write.TraceInline("printing videos assigment", true);
 
+#warning optimisation needed
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine(this.CacheServers.Where(x => x.VideosID.Any()).Count().ToString());
+            sb.AppendLine(this.CacheServers.Values.Where(x => x.VideoIds.Any()).Count().ToString());
 
-            foreach (CacheServer cacheServer in this.CacheServers)
+            foreach (KeyValuePair<int, CacheServer> cacheServer in this.CacheServers)
             {
-                if (cacheServer.VideosID.Any())
+                if (cacheServer.Value.VideoIds.Any())
                 {
-                    sb.Append(cacheServer.ID + " ");
+                    sb.Append(cacheServer.Key + " ");
 
-                    foreach (int id in cacheServer.VideosID)
+                    foreach (int id in cacheServer.Value.VideoIds)
                     {
                         sb.Append(id.ToString() + " ");
                     }
@@ -310,6 +324,8 @@
             if (File.Exists(outputFile)) File.Delete(outputFile);
 
             File.WriteAllText(outputFile, sb.ToString());
+
+            Write.TraceWatch(" : ");
         }
 
         public void TraceScore(bool resetWatch = true, bool console = true)
@@ -341,13 +357,16 @@
 
         private void ProcessAssign(IEnumerable<GainCacheServer> gainCacheServers)
         {
-            Write.TraceWatch("process assign videos to cache servers", true);
+            Write.ResetWatch();
+            Write.TraceInline("process assign videos to cache servers", true);
 
             foreach (GainCacheServer gainCacheServer in gainCacheServers)
             {
-                CacheServer cacheServer = (from i in this.CacheServers where i.ID == gainCacheServer.CacheServerID select i).FirstOrDefault();
+                CacheServer cacheServer = this.CacheServers[gainCacheServer.CacheServerID];
                 cacheServer.AssignVideo(gainCacheServer.VideoID, gainCacheServer.VideoSize);
             }
+
+            Write.TraceWatch(" : ");
         }
     }
 }

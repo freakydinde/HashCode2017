@@ -7,14 +7,12 @@
     {
         public int CurrentSize;
         public List<int> EndPointIds;
-        public int ID;
         public int MaxSize;
         public int RemainingSize;
-        public List<int> VideosID;
+        public List<int> VideoIds;
 
-        public CacheServer(int id, int maxSize)
+        public CacheServer(int maxSize)
         {
-            this.ID = id;
             this.MaxSize = maxSize;
             this.EndPointIds = new List<int>();
 
@@ -23,7 +21,7 @@
 
         public void Reset()
         {
-            VideosID = new List<int>();
+            VideoIds = new List<int>();
 
             this.CurrentSize = 0;
             this.RemainingSize = this.MaxSize;
@@ -40,7 +38,7 @@
                 {
                     this.CurrentSize += videoSize;
                     this.RemainingSize -= videoSize;
-                    this.VideosID.Add(videoId);
+                    this.VideoIds.Add(videoId);
 
                     Write.Trace($"SUCCESS assign video : {videoId} to {this.ToString()}");
 
@@ -68,12 +66,12 @@
 
         public bool IsVideoHost(int videoID)
         {
-            return this.VideosID.Where(x => x == videoID).Any();
+            return this.VideoIds.Where(x => x == videoID).Any();
         }
         
         public override string ToString()
         {
-            return Write.Invariant($"cacheServerID:{this.ID} CurrentSize:{this.CurrentSize} RemainingSize:{this.RemainingSize} MaxSize:{this.MaxSize}");
+            return Write.Invariant($"CurrentSize:{this.CurrentSize} RemainingSize:{this.RemainingSize} MaxSize:{this.MaxSize}");
         }
     }
 }

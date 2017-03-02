@@ -1,21 +1,18 @@
 ﻿namespace HashCode
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     public class EndPoint
     {
-        public List<Latency> CacheServerLatencies;
         public List<int> CacheServerIds;
+        public Dictionary<int, int> CacheServerLatencies;
         public int DataCenterLatency;
-        public int ID;
 
-        public EndPoint(int id, int dataCenterLatency)
+        public EndPoint(int dataCenterLatency)
         {
-            this.ID = id;
             this.DataCenterLatency = dataCenterLatency;
-            this.CacheServerLatencies = new List<Latency>();
+            this.CacheServerLatencies = new Dictionary<int, int>();
             this.CacheServerIds = new List<int>();
         }
 

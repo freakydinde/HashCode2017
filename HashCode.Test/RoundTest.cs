@@ -75,13 +75,14 @@
                 }
             }
 
-            foreach (EndPoint endpoint in round.EndPoints)
+            foreach (EndPoint endpoint in round.EndPoints.Values)
             {
                 stringBuilder.AppendLine(Write.Invariant($"{endpoint.DataCenterLatency} {endpoint.CacheServerLatencies.Count}"));
 
-                foreach (Latency latency in endpoint.CacheServerLatencies)
+                foreach (int id in endpoint.CacheServerIds)
                 {
-                    stringBuilder.AppendLine(Write.Invariant($"{latency.CacheServerID} {latency.Time}"));
+                    int latency = endpoint.CacheServerLatencies[id];
+                    stringBuilder.AppendLine(Write.Invariant($"{id} {latency}"));
                 }
             }
 

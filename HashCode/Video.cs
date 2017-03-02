@@ -2,13 +2,10 @@
 {
     public class Video
     {
-        public int ID;
-
         public int Size;
 
-        public Video(int id, int size)
+        public Video(int size)
         {
-            this.ID = id;
             this.Size = size;
         }
 
@@ -16,7 +13,7 @@
         /// <returns>this as <see cref="string"/></returns>
         public override string ToString()
         {
-            return Write.Invariant($"ID:{this.ID} Size:{this.Size}");
+            return Write.Invariant($"Size:{this.Size}");
         }
     }
 }
