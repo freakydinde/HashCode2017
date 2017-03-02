@@ -1,4 +1,3 @@
-C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.csprojResolveAssemblyReference.cache
 C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\HashCode.Test.dll
 C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\HashCode.Test.pdb
 C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\HashCode.Client.exe
@@ -7,5 +6,6 @@ C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\Microsoft.VisualStudio.Quality
 C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\HashCode.Client.pdb
 C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\HashCode.pdb
 C:\Tfs\Git\HashCode2017\HashCode.Test\bin\Release\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.csprojResolveAssemblyReference.cache
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.dll
 C:\Tfs\Git\HashCode2017\HashCode.Test\obj\Release\HashCode.Test.pdb
