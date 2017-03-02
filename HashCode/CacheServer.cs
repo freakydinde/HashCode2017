@@ -18,6 +18,11 @@
             this.MaxSize = maxSize;
             this.EndPointIds = new List<int>();
 
+            this.Reset();
+        }
+
+        public void Reset()
+        {
             VideosID = new List<int>();
 
             this.CurrentSize = 0;
@@ -29,17 +34,12 @@
         /// <returns>true if assigment was possible, otherwise false</returns>
         public bool AssignVideo(int videoId, int videoSize)
         {
-            Write.Trace($"this.CurrentSize + videoSize <= this.MaxSize ??? {this.CurrentSize} + {videoSize} <= {this.MaxSize} ?");
-
             if (!this.IsVideoHost(videoId))
             {
                 if (this.CurrentSize + videoSize <= this.MaxSize)
                 {
                     this.CurrentSize += videoSize;
                     this.RemainingSize -= videoSize;
-
-                    Write.Trace($"yes, new current:{CurrentSize} remaining:{RemainingSize}");
-
                     this.VideosID.Add(videoId);
 
                     Write.Trace($"SUCCESS assign video : {videoId} to {this.ToString()}");

@@ -58,8 +58,6 @@
             List<Video> videos = new List<Video>();
             foreach (int size in videoSizes)
             {
-                Write.Trace($"video {videoIndex} size : {size}");
-
                 videos.Add(new Video(videoIndex, size));
 
                 videoIndex++;
@@ -68,8 +66,6 @@
             List<CacheServer> cacheServers = new List<CacheServer>();
             for (int cacheServerIndex = 0; cacheServerIndex < cacheServerNumber; cacheServerIndex++)
             {
-                Write.Trace($"cache server {cacheServerIndex} capacity : {cacheServerCapacity}");
-
                 cacheServers.Add(new CacheServer(cacheServerIndex, cacheServerCapacity));
             }
 
@@ -91,8 +87,6 @@
                 int dataCenterLatency = firstLine[0];
                 int dataCenterNumber = firstLine[1];
 
-                Write.Trace($"endpoint {endPointId} dataCenterLatency : {dataCenterLatency}");
-
                 EndPoint endpoint = new EndPoint(endPointId, dataCenterLatency);
 
                 List<Latency> latencies = new List<Latency>();
@@ -106,8 +100,6 @@
                     int cacheServerLatency = nextLine[1];
 
                     cacheServers[cacheServerId].EndPointIds.Add(endPointId);
-
-                    Write.Trace($"cacheserver {cacheServerId}, latency : {cacheServerLatency}");
 
                     endpoint.CacheServerIds.Add(cacheServerId);
                     endpoint.CacheServerLatencies.Add(new Latency(cacheServerId, cacheServerLatency));
@@ -127,8 +119,6 @@
                 int videoId = currentLine[0];
                 int endpointId = currentLine[1];
                 int occurency = currentLine[2];
-
-                Write.Trace($"new request endpointid {endpointId}, videoid : {videoId}, occurency : {occurency}");
 
                 requests.Add(new Request(endpointId, videoId, occurency));
             }
@@ -151,8 +141,6 @@
 
             foreach (Request request in this.Requests)
             {
-                Write.Trace($"processing request {request}");
-
                 EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
 
                 if (endPoint.CacheServerIds.Any())
@@ -166,21 +154,13 @@
                     {
                         foreach (Latency latency in endPoint.CacheServerLatencies)
                         {
-                            Write.Trace($"latency : {latency}");
-
                             int gain = (endPoint.DataCenterLatency - latency.Time) * request.Occurency;
                             GainCacheServer gainCacheServer = new GainCacheServer(endPoint.ID, latency.CacheServerID, gain, video.ID, video.Size);
 
                             if (gainCacheServer.GainPerMegaByte >= bestGain.GainPerMegaByte)
                             {
-                                Write.Trace($"best gain from cache server {gainCacheServer}");
-
                                 bestGain = gainCacheServer;
                                 cacheServerID = latency.CacheServerID;
-                            }
-                            else
-                            {
-                                Write.Trace($"best gain {bestGain.GainPerMegaByte} < gain from cache server {gainCacheServer}");
                             }
                         }
 
@@ -208,8 +188,6 @@
 
             foreach (Request request in this.Requests)
             {
-                Write.Trace($"processing request {request}");
-
                 EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
 
                 IEnumerable<CacheServer> endPointCacheServer = from i in this.CacheServers where endPoint.CacheServerIds.Where(x => x == i.ID).Any() select i;
@@ -242,7 +220,7 @@
                     }
                     else if (endPointCacheServer.Where(x => x.IsVideoHost(request.VideoID)).Any())
                     {
-                        Write.Trace($"video is already hosted on another endpoint cache server");
+                        Write.Trace($"video {request.VideoID} is already hosted on another endpoint cache server");
                     }
                 }
             }
@@ -255,11 +233,14 @@
             IEnumerable<int[]> outputs = Read.NumberLines(input);
 
             this.Score = 0;
+            int requestsNumber = this.Requests.Sum(x => x.Occurency);
 
-            int requestsNumber = this.Requests.Count();
             int usedCacheServersNumber = outputs.ElementAt(0)[0];
 
-            Write.Trace($"requestsNumber:{requestsNumber} usedCacheServersNumber:{usedCacheServersNumber}");
+            foreach(CacheServer cacheServer in this.CacheServers)
+            {
+                cacheServer.Reset();
+            }
 
             foreach (int[] line in outputs.Skip(1))
             {
@@ -275,23 +256,18 @@
                         {
                             EndPoint endPoint = (from i in this.EndPoints where i.ID == request.EndPointID select i).FirstOrDefault();
 
-                            int latency = (from i in endPoint.CacheServerLatencies where i.CacheServerID == cacheServer.ID select i.Time).FirstOrDefault();
+                            if (endPoint.IsConnectedToCacheServer(cacheServer.ID))
+                            {
+                                int cacheServerLatency = (from i in endPoint.CacheServerLatencies where i.CacheServerID == cacheServer.ID select i.Time).FirstOrDefault();
+                                int gain = (endPoint.DataCenterLatency - cacheServerLatency) * request.Occurency;
 
-                            this.Score += latency * request.Occurency;
+                                this.Score += gain;
+                            }
                         }
                     }
                     else
                     {
-                        if (cacheServer.IsVideoHost(videoID))
-                        {
-                            Write.Trace($"Error: Video {videoID} is already hosted on cache server {cacheServer.ID}", true);
-                        }
-                        else
-                        {
-                            Write.Trace($"Error: Video {videoID} does not fit in the cache server {cacheServer.ID}", true);
-                        }
-
-                        return false;
+                        Write.TraceVisible($"ERROR, video {video.ID} to datacacheServer {cacheServer.ID} (alreadyHosted or cacheServer full, ouput is INVALID");
                     }
                 }
             }
@@ -369,20 +345,8 @@
 
             foreach (GainCacheServer gainCacheServer in gainCacheServers)
             {
-                Write.TraceWatch($"processing gainCacheServer {gainCacheServer.ToString()}");
-
-                IEnumerable<CacheServer> endpointCacheServers = this.CacheServers.Where(x => x.IsConnectedToEndPoint(gainCacheServer.EndPointID));
-                IEnumerable<CacheServer> endPointCacheServersVideoHost = endpointCacheServers.Where(x => x.IsVideoHost(gainCacheServer.VideoID));
-
-                if (!endPointCacheServersVideoHost.Any())
-                {
-                    CacheServer cacheServer = (from i in endpointCacheServers where i.ID == gainCacheServer.CacheServerID select i).FirstOrDefault();
-                    cacheServer.AssignVideo(gainCacheServer.VideoID, gainCacheServer.VideoSize);
-                }
-                else
-                {
-                    Write.Trace($"video id {gainCacheServer.VideoID} is already hosted on a endpoint cache server");
-                }
+                CacheServer cacheServer = (from i in this.CacheServers where i.ID == gainCacheServer.CacheServerID select i).FirstOrDefault();
+                cacheServer.AssignVideo(gainCacheServer.VideoID, gainCacheServer.VideoSize);
             }
         }
     }

@@ -42,10 +42,12 @@
 
             RoundTests.round.PrintAssigment(Inputs.OutExample);
 
-            RoundTests.round.TraceScore();
+            if (RoundTests.round.ComputeScore(Inputs.OutExample)) RoundTests.round.TraceScore();
 
             string actual = File.ReadAllText(Inputs.OutExample) + RoundTests.round.Score.ToString();
-            string expected = "1\r\n0 3 1\r\n562500\r\n";
+            string expected = "1\r\n0 3 1 \r\n562500";
+
+            Write.Trace(actual);
 
             Assert.AreEqual(expected, actual);
         }
