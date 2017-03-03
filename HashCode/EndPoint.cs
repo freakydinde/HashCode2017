@@ -20,5 +20,10 @@
         {
             return this.CacheServerIds.Where(x => x == cacheServerID).Any();
         }
+
+        public int LatencyToCacheServer(int cacheServerID)
+        {
+            return this.CacheServerLatencies[cacheServerID];
+        }
     }
 }

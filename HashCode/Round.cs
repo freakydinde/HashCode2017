@@ -37,8 +37,7 @@
 
         public static Round RoundFromFile(string input)
         {
-            Write.ResetWatch();
-            Write.TraceInline("Read input file", true);
+            Write.StartWatch($"RoundFromFile {Path.GetFileName(input)}", true);
 
             IEnumerable<int[]> inputs = Read.NumberLines(input);
 
@@ -121,7 +120,7 @@
             }
             while (nextLinesEnumerator.MoveNext());
 
-            Write.TraceWatch(" : ");
+            Write.EndWatch(true);
 
             return new Round(cacheServers, endpoints, requests, videos, cacheServerCapacity);
         }
@@ -134,8 +133,7 @@
 
         public void AssignVideosBestGain()
         {
-            Write.ResetWatch();
-            Write.TraceInline("AssignVideos BestGain : build gain cache servers list", true);
+            Write.StartWatch("AssignVideos BestGain : build gain cache servers list", true);
 
             List<GainCacheServer> gainCacheServers = new List<GainCacheServer>();
 
@@ -177,15 +175,14 @@
                 }
             }
 
-            Write.TraceWatch(" : ");
+            Write.EndWatch(true);
 
             ProcessAssign(from i in gainCacheServers.OrderByDescending(y => y.GainPerMegaByte) group i by new { i.VideoID, i.EndPointID } into grp orderby grp.Count() select grp.First());
         }
 
         public void AssignVideosLeft()
         {
-            Write.ResetWatch();
-            Write.TraceInline("AssignVideos Left : build gain cache servers list", true);
+            Write.StartWatch("AssignVideos Left : build gain cache servers list", true);
 
             List<GainCacheServer> gainCacheServers = new List<GainCacheServer>();
 
@@ -227,15 +224,14 @@
                 }
             }
 
-            Write.TraceWatch(" : ");
+            Write.EndWatch(true);
 
             ProcessAssign(gainCacheServers.OrderByDescending(y => y.GainPerMegaByte));
         }
 
         public bool ComputeScore(string input)
         {
-            Write.ResetWatch();
-            Write.TraceInline("Compute score", true);
+            Write.StartWatch("Compute score", true);
 
             IEnumerable<int[]> outputs = Read.NumberLines(input);
 
@@ -253,38 +249,43 @@
             {
                 int cacheServerID = line[0];
 
+                Write.TraceVisible($"cache server {cacheServerID}");
+
                 CacheServer cacheServer = this.CacheServers[cacheServerID];
 
                 foreach (int videoID in line.Skip(1))
                 {
                     Video video = this.Videos[videoID];
 
-                    if (cacheServer.AssignVideo(videoID, video.Size))
-                    {
-#warning optimisation needed
-                        foreach (Request request in from i in this.Requests where i.VideoID == videoID select i)
-                        {
-                            EndPoint endPoint = this.EndPoints[request.EndPointID];
+                    Write.Trace($"video {videoID}");
 
-                            if (endPoint.IsConnectedToCacheServer(cacheServerID))
-                            {
-                                int cacheServerLatency = endPoint.CacheServerLatencies[cacheServerID];
-                                int gain = (endPoint.DataCenterLatency - cacheServerLatency) * request.Occurency;
-
-                                this.Score += gain;
-                            }
-                        }
-                    }
-                    else
+                    if (!cacheServer.AssignVideo(videoID, video.Size))
                     {
                         Write.TraceVisible($"ERROR, video {videoID} to datacacheServer {cacheServerID} (alreadyHosted or cacheServer full, ouput is INVALID");
                     }
                 }
             }
 
-            this.Score = Math.Round(this.Score * 1000 / requestsNumber);
+            for (int i = 0; i < this.EndPoints.Count(); i++)
+            {
+                EndPoint endPoint = this.EndPoints[i];
 
-            Write.TraceWatch(" : ");
+                foreach (Request request in from j in this.Requests where j.EndPointID == i select j)
+                {
+                    int cacheServerLatency = (from k in this.CacheServers where k.Value.IsVideoHost(request.VideoID) && k.Value.IsConnectedToEndPoint(i) orderby endPoint.LatencyToCacheServer(k.Key) select endPoint.LatencyToCacheServer(k.Key)).FirstOrDefault();
+                    int gain = (endPoint.DataCenterLatency - cacheServerLatency) * request.Occurency;
+
+                    Write.Trace($"request endpoint {request.EndPointID}, (endPoint.DataCenterLatency:{endPoint.DataCenterLatency} - cacheServerLatency:{cacheServerLatency}) * request.Occurency:{request.Occurency} = gain:{(endPoint.DataCenterLatency - cacheServerLatency) * request.Occurency}");
+
+                    this.Score += gain;
+                }
+            }
+
+            this.Score = Math.Round(this.Score * 1000 / requestsNumber, 0);
+
+            Write.Trace($"this.Score * 1000 / requestsNumber {Math.Round(this.Score * 1000 / requestsNumber, 0)}");
+
+            Write.EndWatch(true);
 
             return true;
         }
@@ -298,8 +299,7 @@
 
         public void PrintAssigment(string outputFile)
         {
-            Write.ResetWatch();
-            Write.TraceInline("printing videos assigment", true);
+            Write.StartWatch("printing videos assigment", true);
 
 #warning optimisation needed
             StringBuilder sb = new StringBuilder();
@@ -325,12 +325,12 @@
 
             File.WriteAllText(outputFile, sb.ToString());
 
-            Write.TraceWatch(" : ");
+            Write.EndWatch(true);
         }
 
-        public void TraceScore(bool resetWatch = true, bool console = true)
+        public void TraceScore(bool console = true)
         {
-            Write.TraceWatch($"score : {this.Score}, process time", resetWatch, console);
+            Write.Trace($"score : {this.Score}", console);
         }
 
         /// <summary>Protected implementation of Dispose pattern</summary>
@@ -357,8 +357,7 @@
 
         private void ProcessAssign(IEnumerable<GainCacheServer> gainCacheServers)
         {
-            Write.ResetWatch();
-            Write.TraceInline("process assign videos to cache servers", true);
+            Write.StartWatch("process assign videos to cache servers", true);
 
             foreach (GainCacheServer gainCacheServer in gainCacheServers)
             {
@@ -366,7 +365,7 @@
                 cacheServer.AssignVideo(gainCacheServer.VideoID, gainCacheServer.VideoSize);
             }
 
-            Write.TraceWatch(" : ");
+            Write.EndWatch(true);
         }
     }
 }

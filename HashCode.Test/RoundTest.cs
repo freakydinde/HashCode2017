@@ -21,28 +21,48 @@
         }
 
         [TestMethod]
-        public void MeAtTheZooTest()
+        public void ExampleScoreTest()
+        {
+            Write.TraceVisible("example", true);
+
+            double actual = 0;
+            double expected = 462500;
+
+            string testFile = Path.Combine(Inputs.ResourcesFolder, "example_462500.out");
+
+            RoundTests.round.ComputeScore(testFile);
+
+            actual = RoundTests.round.Score;
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void MeAtTheZooScoreTest()
         {
             Write.TraceVisible("me_at_the_zoo", true);
 
+            double actual = 0;
+            double expected = 484389;
+
+            string testFile = Path.Combine(Inputs.ResourcesFolder, "me_at_the_zoo_484389.out");
+
             using (Round round = Round.RoundFromFile(Inputs.InMeAtTheZoo))
             {
-                round.AssignVideos();
-                round.PrintAssigment(Inputs.OutMeAtTheZoo);
-                if (round.ComputeScore(Inputs.OutMeAtTheZoo)) round.TraceScore();
+                round.ComputeScore(testFile);
+
+                actual = round.Score;
             }
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod()]
-        public void AssignVideosListTest()
+        public void ExampleFullTest()
         {
             RoundTests.round.AssignVideos();
-
-            Write.TraceWatch("videos assigned");
-
             RoundTests.round.PrintAssigment(Inputs.OutExample);
-
-            if (RoundTests.round.ComputeScore(Inputs.OutExample)) RoundTests.round.TraceScore();
+            RoundTests.round.ComputeScore(Inputs.OutExample);
 
             string actual = File.ReadAllText(Inputs.OutExample) + RoundTests.round.Score.ToString();
             string expected = "1\r\n0 3 1 \r\n562500";
