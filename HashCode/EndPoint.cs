@@ -6,6 +6,7 @@
     public class EndPoint
     {
         public List<int> CacheServerIds;
+        public List<int> SharedCacheServerIds;
         public Dictionary<int, int> CacheServerLatencies;
         public int DataCenterLatency;
 

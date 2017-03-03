@@ -57,10 +57,31 @@
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void TrendingTodayScoreTest()
+        {
+            Write.TraceVisible("trending today", true);
+
+            double actual = 0;
+            double expected = 499237;
+
+            string testFile = Path.Combine(Inputs.ResourcesFolder, "trending_today_499237.out");
+
+            using (Round round = Round.RoundFromFile(Inputs.InTrendingToday))
+            {
+                round.ComputeScore(testFile);
+
+                actual = round.Score;
+            }
+
+            Assert.AreEqual(expected, actual);
+        }
+
         [TestMethod()]
         public void ExampleFullTest()
         {
             RoundTests.round.AssignVideos();
+
             RoundTests.round.PrintAssigment(Inputs.OutExample);
             RoundTests.round.ComputeScore(Inputs.OutExample);
 
